@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Solicite seu serviço | TechFlow</title>
+
+    <link href="style.css" rel="stylesheet" />
+    <script src="solicitacao.js" defer></script>
+</head>
+
+<body>
+
+    <!-- CABEÇALHO -->
+    <header class="cabecalho">
+        <div class="limite navegacao">
+
+            <a aria-label="TechFlow, início"
+               class="marca"
+               href="#inicio">
+
+                <img alt="" src="../img/LOGO.png" />
+
+                <span>
+                    Tech<span>Flow</span>
+                </span>
+            </a>
+
+            <nav aria-label="Navegação da solicitação">
+                <a href="#servico">Solicitar serviço</a>
+                <a href="#duvidas">Tire suas dúvidas</a>
+            </nav>
+
+            <span class="etiqueta-cabecalho">
+                <svg
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.6"
+                    viewBox="0 0 24 24"
+                >
+                    <path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6Z"></path>
+                    <path d="m8 12 3 3 5-6"></path>
+                </svg>
+
+                Seu equipamento em boas mãos
+            </span>
+
+        </div>
+    </header>
+
+    <main class="limite" id="inicio">
+
+        <!-- APRESENTAÇÃO -->
+        <section class="apresentacao">
+
+            <div class="texto-apresentacao">
+
+                <p class="sobretitulo">
+                    CUIDADO QUE COMEÇA COM UMA CONEXÃO
+                </p>
+
+                <h1>
+                    Deu problema?
+                    <br />
+                    Vamos
+                    <span>resolver juntos.</span>
+                </h1>
+
+                <p>
+                    Conte o que aconteceu, escolha como prefere
+                    ser atendido e envie sua solicitação.
+                    O próximo passo começa aqui.
+                </p>
+
+                <div class="beneficios">
+                    <span>✓ Solicitação sem complicação</span>
+                    <span>✓ Tudo em uma única página</span>
+                </div>
+
+            </div>
+
+            <aside class="cartao-apresentacao">
+
+                <div class="detalhe-orbita"></div>
+
+                <span class="icone-apresentacao">
+                    <svg
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.6"
+                        viewBox="0 0 24 24"
+                    >
+                        <rect height="12" rx="2" width="18" x="3" y="4"></rect>
+                        <path d="M1 20h22M8 16l-1 4M16 16l1 4"></path>
+                    </svg>
+                </span>
+
+                <div>
+                    <small>DO PRIMEIRO CONTATO À SOLUÇÃO</small>
+
+                    <h2>
+                        Seu equipamento.
+                        <br />
+                        Nosso próximo cuidado.
+                    </h2>
+
+                    <p>Informações claras em cada etapa.</p>
+                </div>
+
+                <span class="selo-apresentacao">
+                    ✦ Feito para facilitar sua rotina
+                </span>
+
+            </aside>
+
+        </section>
+
+        <!-- ETAPAS -->
+        <div class="guia">
+
+            <a href="#servico">
+                <span>01</span>
+                <div>
+                    <strong>Conte o problema</strong>
+                    <small>Equipamento e serviço</small>
+                </div>
+            </a>
+
+            <i></i>
+
+            <a href="#atendimento">
+                <span>02</span>
+                <div>
+                    <strong>Escolha o atendimento</strong>
+                    <small>Contato e preferência</small>
+                </div>
+            </a>
+
+            <i></i>
+
+            <a href="#revisao">
+                <span>03</span>
+                <div>
+                    <strong>Revise e solicite</strong>
+                    <small>Confira os dados</small>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- FORMULÁRIO E RESUMO -->
+        <div class="estrutura-pedido" id="area-pedido">
+
+            <form id="formulario-servico">
+
+                <!-- ETAPA 01 -->
+                <section class="painel" id="servico">
+
+                    <div class="titulo-painel">
+                        <span class="numero-secao">01</span>
+
+                        <div>
+                            <h2>Como podemos ajudar?</h2>
+                            <p>Primeiro, vamos conhecer o seu equipamento.</p>
+                        </div>
+                    </div>
+
+                    <!-- CATEGORIAS -->
+                    <fieldset class="grupo-equipamentos">
+
+                        <legend>
+                            Qual equipamento precisa de atenção?
+                        </legend>
+
+                        <div class="opcoes-equipamentos">
+
+                            <label class="opcao-equipamento">
+
+                                <input
+                                    checked
+                                    name="categoria"
+                                    type="radio"
+                                    value="1"
+                                />
+
+                                <span>
+                                    <svg
+                                        aria-hidden="true"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.6"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <rect height="12" rx="2" width="18" x="3" y="4"></rect>
+                                        <path d="M1 20h22M8 16l-1 4M16 16l1 4"></path>
+                                    </svg>
+
+                                    <strong>Computador / Notebook</strong>
+                                    <b aria-hidden="true">✓</b>
+                                </span>
+
+                            </label>
+
+                            <label class="opcao-equipamento">
+
+                                <input
+                                    name="categoria"
+                                    type="radio"
+                                    value="2"
+                                />
+
+                                <span>
+                                    <svg
+                                        aria-hidden="true"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.6"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path d="M6 9V3h12v6M6 17H3V9h18v8h-3"></path>
+                                        <rect height="7" width="12" x="6" y="14"></rect>
+                                    </svg>
+
+                                    <strong>Celular / Smartphone</strong>
+                                    <b aria-hidden="true">✓</b>
+                                </span>
+
+                            </label>
+
+                        </div>
+                    </fieldset>
+
+                    <!-- EQUIPAMENTO EXISTENTE -->
+                    <label for="equipamento-existente">
+                        Equipamento já cadastrado (opcional)
+                    </label>
+
+                    <select id="equipamento-existente">
+                        <option value="">
+                            Cadastrar um novo equipamento
+                        </option>
+                    </select>
+
+                    <!-- NOVO EQUIPAMENTO -->
+                    <div id="dados-novo-equipamento">
+
+                        <label for="equipamento">
+                            Nome do equipamento
+                        </label>
+
+                        <input
+                            id="equipamento"
+                            name="equipamento"
+                            maxlength="100"
+                            placeholder="Ex.: Notebook de trabalho"
+                            required
+                        />
+
+                        <div class="linha-campos">
+
+                            <div>
+                                <label for="marca">Marca</label>
+
+                                <input
+                                    id="marca"
+                                    maxlength="100"
+                                    placeholder="Ex.: Dell"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label for="modelo">Modelo</label>
+
+                                <input
+                                    id="modelo"
+                                    maxlength="100"
+                                    placeholder="Ex.: Inspiron 15"
+                                    required
+                                />
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- TIPOS DE SERVIÇO -->
+                    <fieldset class="grupo-servicos">
+
+                        <legend>
+                            Que tipo de serviço você procura?
+                        </legend>
+
+                        <label class="opcao-servico">
+
+                            <input
+                                checked
+                                name="servico"
+                                type="radio"
+                                value="diagnostico"
+                            />
+
+                            <span>
+                                <strong>Diagnóstico técnico</strong>
+                                <small>
+                                    Avaliação inicial para identificar
+                                    o problema.
+                                </small>
+                            </span>
+
+                        </label>
+
+                        <label class="opcao-servico">
+
+                            <input
+                                name="servico"
+                                type="radio"
+                                value="tela"
+                            />
+
+                            <span>
+                                <strong>Troca de Tela</strong>
+                                <small>
+                                    Reparo ou substituição de tela
+                                    do equipamento.
+                                </small>
+                            </span>
+
+                        </label>
+
+                        <label class="opcao-servico">
+
+                            <input
+                                name="servico"
+                                type="radio"
+                                value="manutencao"
+                            />
+
+                            <span>
+                                <strong>Manutenção técnica</strong>
+                                <small>
+                                    Atendimento técnico, sujeito
+                                    à avaliação do defeito.
+                                </small>
+                            </span>
+
+                        </label>
+
+                    </fieldset>
+
+                    <p class="nota-campo">
+                        Descreva sua necessidade para que a equipe
+                        possa avaliar o atendimento.
+                    </p>
+
+                    <label for="problema">
+                        Conte o que está acontecendo
+                    </label>
+
+                    <textarea
+                        id="problema"
+                        name="problema"
+                        maxlength="1000"
+                        minlength="10"
+                        placeholder="Quando começou? O equipamento liga? Aparece alguma mensagem de erro?"
+                        required
+                        rows="4"
+                    ></textarea>
+
+                    <div class="rodape-campo">
+                        Descreva o problema com pelo menos 10 caracteres.
+                    </div>
+
+                </section>
+
+                <!-- ETAPA 02 -->
+                <section class="painel" id="atendimento">
+
+                    <div class="titulo-painel">
+                        <span class="numero-secao">02</span>
+
+                        <div>
+                            <h2>Vamos combinar os detalhes?</h2>
+                            <p>
+                                Preencha seus dados e a preferência
+                                de atendimento.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="linha-campos">
+
+                        <div>
+                            <label for="nome">Nome completo</label>
+
+                            <input
+                                autocomplete="name"
+                                id="nome"
+                                name="nome"
+                                maxlength="100"
+                                placeholder="Como podemos chamar você?"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label for="telefone">
+                                Telefone com DDD
+                            </label>
+
+                            <input
+                                autocomplete="tel"
+                                id="telefone"
+                                name="telefone"
+                                maxlength="20"
+                                placeholder="(11) 99999-9999"
+                                required
+                                type="tel"
+                            />
+                        </div>
+
+                    </div>
+
+                    <label for="email">E-mail</label>
+
+                    <input
+                        autocomplete="email"
+                        id="email"
+                        maxlength="150"
+                        placeholder="voce@exemplo.com"
+                        required
+                        type="email"
+                    />
+
+                    <!-- MODALIDADE -->
+                    <fieldset class="grupo-modalidade">
+
+                        <legend>
+                            Onde você prefere o atendimento?
+                        </legend>
+
+                        <label>
+
+                            <input
+                                checked
+                                name="modalidade"
+                                type="radio"
+                                value="loja"
+                            />
+
+                            <span>
+                                <strong>Levar à assistência</strong>
+                                <small>Atendimento na unidade</small>
+                            </span>
+
+                        </label>
+
+                        <label>
+
+                            <input
+                                name="modalidade"
+                                type="radio"
+                                value="domicilio"
+                            />
+
+                            <span>
+                                <strong>Receber um técnico</strong>
+                                <small>Informe o endereço abaixo</small>
+                            </span>
+
+                        </label>
+
+                    </fieldset>
+
+                    <!-- ENDEREÇO -->
+                    <div id="campo-endereco">
+
+                        <label for="endereco">
+                            Endereço completo
+                            (para atendimento em domicílio)
+                        </label>
+
+                        <input
+                            autocomplete="street-address"
+                            id="endereco"
+                            name="endereco"
+                            maxlength="200"
+                            placeholder="Rua, número, bairro e cidade"
+                        />
+
+                    </div>
+
+                    <!-- DATA E PERÍODO -->
+                    <div class="linha-campos">
+
+                        <div>
+                            <label for="data">
+                                Data de preferência
+                            </label>
+
+                            <input
+                                id="data"
+                                name="data"
+                                required
+                                type="date"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="periodo">
+                                Período de preferência
+                            </label>
+
+                            <select
+                                id="periodo"
+                                name="periodo"
+                                required
+                            >
+                                <option value="">
+                                    Selecione o período
+                                </option>
+
+                                <option>
+                                    Manhã · 08h às 12h
+                                </option>
+
+                                <option>
+                                    Tarde · 13h às 18h
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="lembrete">
+                        <span>ⓘ</span>
+
+                        <p>
+                            A data é uma preferência.
+                            O horário e o local do atendimento
+                            precisam ser confirmados pela equipe.
+                        </p>
+                    </div>
+
+                </section>
+
+                <!-- ETAPA 03 -->
+                <section class="painel" id="revisao">
+
+                    <div class="titulo-painel">
+                        <span class="numero-secao">03</span>
+
+                        <div>
+                            <h2>Está tudo certo?</h2>
+                            <p>
+                                Confira suas informações antes de enviar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="nota-campo">
+                        A equipe vai analisar o problema e
+                        confirmar os detalhes do atendimento.
+                    </p>
+
+                    <label class="aceite">
+
+                        <input
+                            id="confirmacao"
+                            required
+                            type="checkbox"
+                        />
+
+                        <span>
+                            Conferi os dados e entendo que a data
+                            escolhida depende de confirmação da equipe.
+                        </span>
+
+                    </label>
+
+                    <p
+                        class="mensagem"
+                        id="mensagem-formulario"
+                        role="alert"
+                    ></p>
+
+                    <button
+                        class="botao botao-finalizar"
+                        id="botao-finalizar"
+                        type="submit"
+                    >
+                        Enviar solicitação
+                        <span>↗</span>
+                    </button>
+
+                    <p class="legenda-finalizar">
+                        Guarde seu protocolo para identificar o atendimento.
+                    </p>
+
+                    <p
+                        id="protocolo-criado"
+                        aria-live="polite"
+                    ></p>
+
+                </section>
+
+            </form>
+
+            <!-- RESUMO DA SOLICITAÇÃO -->
+            <aside class="coluna-resumo">
+
+                <div class="resumo" id="resumo-pedido">
+
+                    <div class="cabecalho-resumo">
+
+                        <span>
+                            <svg
+                                aria-hidden="true"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.6"
+                                viewBox="0 0 24 24"
+                            >
+                                <rect
+                                    height="18"
+                                    rx="2"
+                                    width="14"
+                                    x="5"
+                                    y="3"
+                                ></rect>
+
+                                <path d="M9 8h6M9 12h6M9 16h4"></path>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <p class="sobretitulo">
+                                TUDO CONFERIDO?
+                            </p>
+
+                            <h2>Seu atendimento</h2>
+                        </div>
+
+                        <span class="selo-resumo">RESUMO</span>
+
+                    </div>
+
+                    <div class="servico-resumo">
+
+                        <div>
+                            <strong id="resumo-categoria">
+
+                                <span class="categoria-resumo computador">
+                                    Computador / Notebook
+                                </span>
+
+                                <span class="categoria-resumo impressora">
+                                    Celular / Smartphone
+                                </span>
+
+                            </strong>
+
+                            <small id="resumo-modelo">
+                                Confira os dados no formulário
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <dl class="detalhes-resumo">
+
+                        <div>
+                            <dt>Serviço escolhido</dt>
+
+                            <dd>
+                                <span class="resumo-tipo diagnostico">
+                                    Diagnóstico técnico
+                                </span>
+
+                                <span class="resumo-tipo limpeza">
+                                    Troca de Tela
+                                </span>
+
+                                <span class="resumo-tipo manutencao">
+                                    Manutenção técnica
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>Modalidade</dt>
+
+                            <dd>
+                                <span class="resumo-local loja">
+                                    Na assistência
+                                </span>
+
+                                <span class="resumo-local domicilio">
+                                    Em domicílio
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>Preferência</dt>
+                            <dd>Informe no formulário</dd>
+                        </div>
+
+                        <div>
+                            <dt>Contato</dt>
+                            <dd>Preencha seus dados ao lado</dd>
+                        </div>
+
+                    </dl>
+
+                    <div class="aviso-resumo">
+
+                        <svg
+                            aria-hidden="true"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.6"
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6Z"></path>
+                            <path d="m8 12 3 3 5-6"></path>
+                        </svg>
+
+                        <p>
+                            Confira as informações e envie seu
+                            pedido para a equipe.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="botao botao-resumo"
+                        id="enviar-resumo"
+                        type="button"
+                    >
+                        Enviar solicitação ↗
+                    </button>
+
+                </div>
+
+                <div class="ajuda-resumo">
+
+                    <span>✦</span>
+
+                    <div>
+                        <h3>Não sabe qual serviço escolher?</h3>
+
+                        <p>
+                            Comece pelo diagnóstico.
+                            Descreva o problema para orientar a avaliação.
+                        </p>
+
+                        <a
+                            class="link-diagnostico"
+                            href="#servico"
+                        >
+                            Ver opções de serviço →
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="etapas-resumo">
+
+                    <h3>Depois da solicitação</h3>
+
+                    <p>
+                        <span>1</span>
+                        A equipe analisa seu chamado.
+                    </p>
+
+                    <p>
+                        <span>2</span>
+                        Vocês confirmam os detalhes.
+                    </p>
+
+                    <p>
+                        <span>3</span>
+                        O atendimento pode começar.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+        <!-- MINHAS ORDENS -->
+        <section
+            class="painel"
+            id="minhas-ordens"
+            aria-labelledby="titulo-minhas-ordens"
+        >
+
+            <div class="titulo-painel">
+
+                <span class="numero-secao">✓</span>
+
+                <div>
+                    <h2 id="titulo-minhas-ordens">
+                        Minhas ordens de serviço
+                    </h2>
+
+                    <p>
+                        Acompanhe o status e o protocolo
+                        dos seus atendimentos.
+                    </p>
+                </div>
+
+            </div>
+
+            <div
+                id="lista-ordens-cliente"
+                aria-live="polite"
+            >
+                Carregando atendimentos...
+            </div>
+
+            <button
+                class="botao"
+                id="atualizar-ordens"
+                type="button"
+            >
+                Atualizar atendimentos
+            </button>
+
+            <button
+                class="botao"
+                id="sair-cliente"
+                type="button"
+            >
+                Sair da minha conta
+            </button>
+
+        </section>
+
+        <!-- DÚVIDAS -->
+        <section class="duvidas" id="duvidas">
+
+            <div>
+                <p class="sobretitulo">
+                    ANTES DE CONCLUIR
+                </p>
+
+                <h2>
+                    Alguma dúvida?
+                    <br />
+                    A gente esclarece.
+                </h2>
+
+                <p>
+                    Mais clareza para o seu próximo passo.
+                </p>
+            </div>
+
+            <div class="perguntas">
+
+                <details open>
+
+                    <summary>
+                        O que devo informar na solicitação?
+                    </summary>
+
+                    <p>
+                        Informe a marca e o modelo do equipamento,
+                        descreva o problema e registre seus dados
+                        de contato. Detalhes ajudam a equipe a
+                        preparar o atendimento.
+                    </p>
+
+                </details>
+
+                <details>
+
+                    <summary>
+                        A data escolhida está garantida?
+                    </summary>
+
+                    <p>
+                        A data e o período são preferências.
+                        A equipe precisa confirmar a disponibilidade
+                        e o endereço da assistência ou a cobertura
+                        do atendimento em domicílio.
+                    </p>
+
+                </details>
+
+                <details>
+
+                    <summary>
+                        Como identifico meu pedido?
+                    </summary>
+
+                    <p>
+                        Após o envio, guarde o protocolo da ordem
+                        de serviço. Você também pode imprimir o
+                        resumo com as informações do atendimento.
+                    </p>
+
+                </details>
+
+            </div>
+
+        </section>
+
+        <!-- RODAPÉ -->
+        <footer>
+
+            <a class="marca" href="#inicio">
+
+                <img alt="" src="../img/LOGO.png" />
+
+                <span>
+                    Tech<span>Flow</span>
+                </span>
+
+            </a>
+
+            <p>
+                Cuidado em cada detalhe.
+                Solução em cada conexão.
+            </p>
+
+            <span>Solicitação de serviço</span>
+
+        </footer>
+
+    </main>
+
+</body>
+</html>
