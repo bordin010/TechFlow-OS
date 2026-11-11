@@ -1,11 +1,9 @@
-// ======================================
-// TECHFLOW - GERENCIAMENTO DE ORDENS
-// Listagem, atribuição, status,
-// diagnóstico e histórico de alterações
-// ======================================
+/* ==========================================
+   TECHFLOW OS - GERENCIAMENTO DE ORDENS
+   Painel do Administrador
+   ========================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-
     // ======================================
     // ELEMENTOS DO PAINEL
     // ======================================
@@ -31,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     async function consultarAPI(caminho, metodo = "GET", corpo = null) {
-
         const opcoes = {
             method: metodo,
             headers: {
@@ -46,7 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const resposta = await fetch(caminho, opcoes);
-        const dados = await resposta.json();
+        const texto = await resposta.text();
+
+        let dados = {};
+
+        if (texto) {
+            try {
+                dados = JSON.parse(texto);
+            } catch {
+                throw new Error("A API retornou uma resposta inválida.");
+            }
+        }
 
         if (!resposta.ok) {
             throw new Error(
@@ -62,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     function classeStatus(status) {
-
         if (status === "Concluída") {
             return "concluida";
         }
@@ -82,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function obterNomeCliente(id) {
-
         if (id == null) {
             return "Não informado";
         }
@@ -91,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function obterNomeTecnico(id) {
-
         if (id == null) {
             return "Não atribuído";
         }
@@ -99,18 +103,41 @@ document.addEventListener("DOMContentLoaded", () => {
         return nomesTecnicos.get(String(id)) || `Técnico #${id}`;
     }
 
-    function criarCelula(linha, texto) {
+    // CORREÇÃO:
+    // Mostrar o nome real do equipamento,
+    // em vez de apresentar somente o ID.
+    function obterNomeEquipamento(os) {
+        const nome = String(os.nomeEquipamento || "").trim();
+        const marca = String(os.marcaEquipamento || "").trim();
+        const modelo = String(os.modeloEquipamento || "").trim();
 
+        if (nome) {
+            return nome;
+        }
+
+        const descricao = [marca, modelo]
+            .filter(Boolean)
+            .join(" ");
+
+        if (descricao) {
+            return descricao;
+        }
+
+        if (os.idEquipamento != null) {
+            return `Equipamento #${os.idEquipamento}`;
+        }
+
+        return "Não informado";
+    }
+
+    function criarCelula(linha, texto) {
         const celula = document.createElement("td");
         celula.textContent = texto ?? "Não informado";
-
         linha.appendChild(celula);
-
         return celula;
     }
 
     function adicionarStatus(linha, status) {
-
         const celula = document.createElement("td");
         const etiqueta = document.createElement("span");
 
@@ -122,26 +149,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function criarBotao(texto, acao) {
-
         const botao = document.createElement("button");
 
         botao.type = "button";
         botao.className = "botao-detalhes";
         botao.textContent = texto;
-
         botao.addEventListener("click", acao);
 
         return botao;
     }
 
     function formatarData(data) {
-
         if (!data) {
             return "Data não informada";
         }
 
-        // Datas SQL sem fuso são interpretadas como locais.
         const texto = String(data);
+
         const dataConvertida = new Date(
             texto.includes("T")
                 ? texto
@@ -162,16 +186,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // MOSTRAR DETALHES
+    // DETALHES DA ORDEM DE SERVIÇO
     // ======================================
 
     function mostrarDetalhes(os) {
-
-        alert([
+        const detalhes = [
             `Ordem de Serviço #${os.idOS}`,
             "",
-            `Cliente: ${obterNomeCliente(os.idCliente)}`,
-            `Equipamento: #${os.idEquipamento ?? "Não informado"}`,
+            `Cliente: ${os.nomeCliente || obterNomeCliente(os.idCliente)}`,
+            `Equipamento: ${obterNomeEquipamento(os)}`,
             `Técnico: ${obterNomeTecnico(os.idTecnico)}`,
             `Status: ${os.statusOS || "Não informado"}`,
             "",
@@ -179,15 +202,21 @@ document.addEventListener("DOMContentLoaded", () => {
             "",
             `Diagnóstico: ${os.diagnostico || "Não informado"}`,
             `Solução: ${os.solucaoAplicada || "Não informada"}`
-        ].join("\n"));
+        ];
+
+        alert(detalhes.join("\n"));
     }
 
     // ======================================
     // JANELA PADRÃO COM SELEÇÃO
     // ======================================
 
-    function criarJanelaSelecao(id, tituloTexto, textoCampo, textoSalvar) {
-
+    function criarJanelaSelecao(
+        id,
+        tituloTexto,
+        textoCampo,
+        textoSalvar
+    ) {
         const janela = document.createElement("dialog");
         janela.id = id;
 
@@ -204,13 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const selecionar = document.createElement("select");
         selecionar.id = `${id}-selecao`;
         selecionar.required = true;
-
         label.htmlFor = selecionar.id;
 
         const acoes = document.createElement("div");
         acoes.className = "acoes-editor";
 
-        const cancelar = criarBotao("Cancelar", () => janela.close());
+        const cancelar = criarBotao(
+            "Cancelar",
+            () => janela.close()
+        );
 
         const salvar = document.createElement("button");
         salvar.type = "submit";
@@ -241,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function adicionarOpcao(select, valor, texto) {
-
         const opcao = document.createElement("option");
 
         opcao.value = valor;
@@ -266,7 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemAtribuicao = null;
 
     function abrirAtribuicao(os) {
-
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
@@ -293,10 +322,10 @@ document.addEventListener("DOMContentLoaded", () => {
             "",
             "Selecione um técnico"
         );
+
         inicial.disabled = true;
 
-        tecnicosAtivos.forEach((tecnico) => {
-
+        tecnicosAtivos.forEach(tecnico => {
             adicionarOpcao(
                 atribuicao.selecionar,
                 String(tecnico.idUsuario),
@@ -316,57 +345,68 @@ document.addEventListener("DOMContentLoaded", () => {
         atribuicao.janela.showModal();
     }
 
-    atribuicao.formulario.addEventListener("submit", async (evento) => {
+    atribuicao.formulario.addEventListener(
+        "submit",
+        async evento => {
+            evento.preventDefault();
 
-        evento.preventDefault();
+            if (!ordemAtribuicao) {
+                return;
+            }
 
-        if (!ordemAtribuicao) {
-            return;
-        }
-
-        const idTecnico = Number(atribuicao.selecionar.value);
-
-        if (!Number.isSafeInteger(idTecnico) || idTecnico <= 0) {
-            alert("Selecione um técnico válido.");
-            return;
-        }
-
-        if (Number(ordemAtribuicao.idTecnico) === idTecnico) {
-            alert("Este técnico já está atribuído à OS.");
-            return;
-        }
-
-        atribuicao.salvar.disabled = true;
-        atribuicao.salvar.textContent = "Salvando...";
-
-        try {
-
-            const idOS = ordemAtribuicao.idOS;
-
-            await consultarAPI(
-                `/api/ordens-servico/${idOS}/atribuir`,
-                "PATCH",
-                { idTecnico }
+            const idTecnico = Number(
+                atribuicao.selecionar.value
             );
 
-            atribuicao.janela.close();
+            if (
+                !Number.isSafeInteger(idTecnico) ||
+                idTecnico <= 0
+            ) {
+                alert("Selecione um técnico válido.");
+                return;
+            }
 
-            await carregarDados();
+            if (
+                Number(ordemAtribuicao.idTecnico) === idTecnico
+            ) {
+                alert("Este técnico já está atribuído à OS.");
+                return;
+            }
 
-            mensagem.textContent =
-                `Técnico atribuído com sucesso à OS #${idOS}!`;
+            atribuicao.salvar.disabled = true;
+            atribuicao.salvar.textContent = "Salvando...";
 
-        } catch (erro) {
+            try {
+                const idOS = ordemAtribuicao.idOS;
 
-            console.error("Erro ao atribuir técnico:", erro);
-            alert(erro.message);
+                await consultarAPI(
+                    `/api/ordens-servico/${idOS}/atribuir`,
+                    "PATCH",
+                    { idTecnico }
+                );
 
-        } finally {
+                atribuicao.janela.close();
 
-            atribuicao.salvar.disabled = false;
-            atribuicao.salvar.textContent = "Salvar atribuição";
+                await carregarDados();
+
+                mensagem.textContent =
+                    `Técnico atribuído com sucesso à OS #${idOS}!`;
+
+            } catch (erro) {
+                console.error(
+                    "Erro ao atribuir técnico:",
+                    erro
+                );
+
+                alert(erro.message);
+
+            } finally {
+                atribuicao.salvar.disabled = false;
+                atribuicao.salvar.textContent =
+                    "Salvar atribuição";
+            }
         }
-    });
+    );
 
     // ======================================
     // ALTERAÇÃO DE STATUS
@@ -382,7 +422,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemStatus = null;
 
     function abrirAlteracaoStatus(os) {
-
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
@@ -400,6 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "",
             "Selecione o novo status"
         );
+
         inicial.disabled = true;
 
         const statusPermitidos = [
@@ -420,8 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
             statusPermitidos.push("Concluída");
         }
 
-        statusPermitidos.forEach((status) => {
-
+        statusPermitidos.forEach(status => {
             if (status !== os.statusOS) {
                 adicionarOpcao(
                     statusJanela.selecionar,
@@ -435,68 +474,71 @@ document.addEventListener("DOMContentLoaded", () => {
         statusJanela.janela.showModal();
     }
 
-    statusJanela.formulario.addEventListener("submit", async (evento) => {
+    statusJanela.formulario.addEventListener(
+        "submit",
+        async evento => {
+            evento.preventDefault();
 
-        evento.preventDefault();
+            if (!ordemStatus) {
+                return;
+            }
 
-        if (!ordemStatus) {
-            return;
+            const novoStatus = statusJanela.selecionar.value;
+
+            if (
+                !novoStatus ||
+                novoStatus === ordemStatus.statusOS
+            ) {
+                alert("Selecione um novo status válido.");
+                return;
+            }
+
+            statusJanela.salvar.disabled = true;
+            statusJanela.salvar.textContent = "Salvando...";
+
+            try {
+                const idOS = ordemStatus.idOS;
+
+                await consultarAPI(
+                    `/api/ordens-servico/${idOS}/status`,
+                    "PATCH",
+                    { novoStatus }
+                );
+
+                statusJanela.janela.close();
+
+                await carregarDados();
+
+                mensagem.textContent =
+                    `Status da OS #${idOS} atualizado para ${novoStatus}!`;
+
+            } catch (erro) {
+                console.error("Erro ao alterar status:", erro);
+                alert(erro.message);
+
+            } finally {
+                statusJanela.salvar.disabled = false;
+                statusJanela.salvar.textContent = "Salvar status";
+            }
         }
-
-        const novoStatus = statusJanela.selecionar.value;
-
-        if (!novoStatus || novoStatus === ordemStatus.statusOS) {
-            alert("Selecione um novo status válido.");
-            return;
-        }
-
-        statusJanela.salvar.disabled = true;
-        statusJanela.salvar.textContent = "Salvando...";
-
-        try {
-
-            const idOS = ordemStatus.idOS;
-
-            await consultarAPI(
-                `/api/ordens-servico/${idOS}/status`,
-                "PATCH",
-                { novoStatus }
-            );
-
-            statusJanela.janela.close();
-
-            await carregarDados();
-
-            mensagem.textContent =
-                `Status da OS #${idOS} atualizado para ${novoStatus}!`;
-
-        } catch (erro) {
-
-            console.error("Erro ao alterar status:", erro);
-            alert(erro.message);
-
-        } finally {
-
-            statusJanela.salvar.disabled = false;
-            statusJanela.salvar.textContent = "Salvar status";
-        }
-    });
+    );
 
     // ======================================
-    // DIAGNÓSTICO E SOLUÇÃO
+    // DIAGNÓSTICO E SOLUÇÃO APLICADA
     // ======================================
 
     const janelaDiagnostico = document.createElement("dialog");
     janelaDiagnostico.id = "janela-diagnostico";
 
     const tituloDiagnostico = document.createElement("h2");
-    tituloDiagnostico.textContent = "Registrar diagnóstico e solução";
+    tituloDiagnostico.textContent =
+        "Registrar diagnóstico e solução";
 
     const descricaoDiagnostico = document.createElement("p");
+
     const formularioDiagnostico = document.createElement("form");
 
     function criarCampoTexto(id, rotulo, placeholder) {
-
         const label = document.createElement("label");
         label.htmlFor = id;
         label.textContent = rotulo;
@@ -504,8 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const campo = document.createElement("textarea");
         campo.id = id;
         campo.rows = 4;
-        campo.required = true;
         campo.placeholder = placeholder;
+
+        // Apenas o diagnóstico é obrigatório.
+        campo.required = id === "campo-diagnostico";
 
         formularioDiagnostico.appendChild(label);
         formularioDiagnostico.appendChild(campo);
@@ -521,7 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const campoSolucao = criarCampoTexto(
         "campo-solucao",
-        "Solução aplicada",
+        "Solução aplicada (opcional nesta etapa)",
         "Descreva os procedimentos realizados."
     );
 
@@ -552,7 +596,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemDiagnostico = null;
 
     function abrirDiagnostico(os) {
-
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
@@ -569,63 +612,74 @@ document.addEventListener("DOMContentLoaded", () => {
         janelaDiagnostico.showModal();
     }
 
-    formularioDiagnostico.addEventListener("submit", async (evento) => {
+    formularioDiagnostico.addEventListener(
+        "submit",
+        async evento => {
+            evento.preventDefault();
 
-        evento.preventDefault();
+            if (!ordemDiagnostico) {
+                return;
+            }
 
-        if (!ordemDiagnostico) {
-            return;
+            const diagnostico =
+                campoDiagnostico.value.trim();
+
+            const solucaoAplicada =
+                campoSolucao.value.trim();
+
+            if (!diagnostico) {
+                alert("Informe o diagnóstico do equipamento.");
+                return;
+            }
+
+            salvarDiagnostico.disabled = true;
+            salvarDiagnostico.textContent = "Salvando...";
+
+            try {
+                const idOS = ordemDiagnostico.idOS;
+
+                await consultarAPI(
+                    `/api/ordens-servico/${idOS}/diagnostico`,
+                    "PATCH",
+                    {
+                        diagnostico,
+                        solucaoAplicada
+                    }
+                );
+
+                janelaDiagnostico.close();
+
+                await carregarDados();
+
+                mensagem.textContent =
+                    `Diagnóstico da OS #${idOS} registrado com sucesso!`;
+
+            } catch (erro) {
+                console.error(
+                    "Erro ao salvar diagnóstico:",
+                    erro
+                );
+
+                alert(erro.message);
+
+            } finally {
+                salvarDiagnostico.disabled = false;
+                salvarDiagnostico.textContent =
+                    "Salvar diagnóstico";
+            }
         }
-
-        const diagnostico = campoDiagnostico.value.trim();
-        const solucaoAplicada = campoSolucao.value.trim();
-
-        if (!diagnostico || !solucaoAplicada) {
-            alert("Informe o diagnóstico e a solução aplicada.");
-            return;
-        }
-
-        salvarDiagnostico.disabled = true;
-        salvarDiagnostico.textContent = "Salvando...";
-
-        try {
-
-            const idOS = ordemDiagnostico.idOS;
-
-            await consultarAPI(
-                `/api/ordens-servico/${idOS}/diagnostico`,
-                "PATCH",
-                { diagnostico, solucaoAplicada }
-            );
-
-            janelaDiagnostico.close();
-
-            await carregarDados();
-
-            mensagem.textContent =
-                `Diagnóstico e solução da OS #${idOS} registrados com sucesso!`;
-
-        } catch (erro) {
-
-            console.error("Erro ao salvar diagnóstico:", erro);
-            alert(erro.message);
-
-        } finally {
-
-            salvarDiagnostico.disabled = false;
-            salvarDiagnostico.textContent = "Salvar diagnóstico";
-        }
-    });
+    );
 
     // ======================================
-    // NOVO: JANELA DE HISTÓRICO
+    // JANELA DE HISTÓRICO
     // ======================================
 
     const janelaHistorico = document.createElement("dialog");
     janelaHistorico.id = "janela-historico-os";
 
     const tituloHistorico = document.createElement("h2");
-    tituloHistorico.textContent = "Histórico da Ordem de Serviço";
+    tituloHistorico.textContent =
+        "Histórico da Ordem de Serviço";
 
     const descricaoHistorico = document.createElement("p");
 
@@ -650,11 +704,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(janelaHistorico);
 
     // ======================================
-    // NOVO: CONSULTAR HISTÓRICO DA OS
+    // CONSULTAR HISTÓRICO DA OS
     // ======================================
 
     async function abrirHistorico(os) {
-
         tituloHistorico.textContent =
             `Histórico da OS #${os.idOS}`;
 
@@ -672,30 +725,28 @@ document.addEventListener("DOMContentLoaded", () => {
         janelaHistorico.showModal();
 
         try {
-
-            // Consultar o histórico real da OS no MySQL
             const historico = await consultarAPI(
                 `/api/ordens-servico/${os.idOS}/historico`
             );
 
             if (!Array.isArray(historico)) {
-                throw new Error("Histórico retornado em formato inválido.");
+                throw new Error(
+                    "Histórico retornado em formato inválido."
+                );
             }
 
             listaHistorico.replaceChildren();
 
             if (historico.length === 0) {
-
                 const item = document.createElement("li");
-                item.textContent = "Nenhuma alteração registrada.";
+                item.textContent =
+                    "Nenhuma alteração registrada.";
 
                 listaHistorico.appendChild(item);
                 return;
             }
 
-            // Mostrar cada movimentação registrada
-            historico.forEach((registro) => {
-
+            historico.forEach(registro => {
                 const item = document.createElement("li");
                 item.style.marginBottom = "18px";
 
@@ -704,14 +755,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     registro.statusNovo || "Não informado";
 
                 const statusAnterior = document.createElement("p");
-
                 statusAnterior.textContent =
                     registro.statusAnterior == null
                         ? "Criação da Ordem de Serviço"
                         : `Status anterior: ${registro.statusAnterior}`;
 
                 const data = document.createElement("small");
-
                 data.textContent =
                     `Data: ${formatarData(registro.dataAlteracao)}`;
 
@@ -723,7 +772,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (erro) {
-
             console.error("Erro ao carregar histórico:", erro);
 
             listaHistorico.replaceChildren();
@@ -741,24 +789,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     function atualizarTabela() {
-
         tabela.replaceChildren();
 
-        const ordensFiltradas = todasOrdens.filter((os) => {
-
+        const ordensFiltradas = todasOrdens.filter(os => {
             return filtro.value === "todos" ||
                 classeStatus(os.statusOS) === filtro.value;
         });
 
-        ordensFiltradas.forEach((os) => {
-
+        ordensFiltradas.forEach(os => {
             const linha = document.createElement("tr");
 
             linha.className =
                 `linha-os ${classeStatus(os.statusOS)}`;
 
             criarCelula(linha, `#${os.idOS}`);
-            criarCelula(linha, obterNomeCliente(os.idCliente));
+
+            criarCelula(
+                linha,
+                obterNomeCliente(os.idCliente)
+            );
 
             criarCelula(
                 linha,
@@ -775,23 +824,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const celulaAcoes = document.createElement("td");
             celulaAcoes.className = "acoes-tabela";
 
-            // Detalhes
+            // Detalhes da OS
             celulaAcoes.appendChild(
                 criarBotao("Detalhes", () => {
                     mostrarDetalhes(os);
                 })
             );
 
-            // NOVO: Histórico, inclusive de OS finalizadas
+            // Histórico da OS
             celulaAcoes.appendChild(
                 criarBotao("Histórico", () => {
                     abrirHistorico(os);
                 })
             );
 
-            // Ações disponíveis apenas para OS abertas
+            // Ações para ordens não finalizadas
             if (!osFinalizada(os)) {
-
                 celulaAcoes.appendChild(
                     criarBotao(
                         os.idTecnico == null
@@ -822,7 +870,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `${ordensFiltradas.length} ordem(ns) encontrada(s).`;
 
         if (ordensFiltradas.length === 0) {
-
             const linha = document.createElement("tr");
             const celula = document.createElement("td");
 
@@ -839,19 +886,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     function atualizarRecentes() {
-
         recentes.replaceChildren();
 
         const ultimasOrdens = [...todasOrdens]
             .sort((a, b) => Number(b.idOS) - Number(a.idOS))
             .slice(0, 3);
 
-        ultimasOrdens.forEach((os) => {
-
+        ultimasOrdens.forEach(os => {
             const linha = document.createElement("tr");
 
             criarCelula(linha, `#${os.idOS}`);
-            criarCelula(linha, obterNomeCliente(os.idCliente));
+
+            criarCelula(
+                linha,
+                obterNomeCliente(os.idCliente)
+            );
+
             adicionarStatus(linha, os.statusOS);
 
             recentes.appendChild(linha);
@@ -863,7 +913,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     async function carregarDados() {
-
         const [ordens, clientes, tecnicos] = await Promise.all([
             consultarAPI("/api/ordens-servico"),
             consultarAPI("/api/clientes"),
@@ -881,21 +930,20 @@ document.addEventListener("DOMContentLoaded", () => {
         todasOrdens = ordens;
 
         nomesClientes = new Map(
-            clientes.map((cliente) => [
+            clientes.map(cliente => [
                 String(cliente.idUsuario),
                 cliente.nomeCompleto
             ])
         );
 
         nomesTecnicos = new Map(
-            tecnicos.map((tecnico) => [
+            tecnicos.map(tecnico => [
                 String(tecnico.idUsuario),
                 tecnico.nomeCompleto
             ])
         );
 
-        tecnicosAtivos = tecnicos.filter((tecnico) => {
-
+        tecnicosAtivos = tecnicos.filter(tecnico => {
             return (
                 tecnico.ativo === 1 ||
                 tecnico.ativo === true ||
@@ -913,12 +961,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     filtro.addEventListener("change", atualizarTabela);
 
-    carregarDados().catch((erro) => {
-
+    carregarDados().catch(erro => {
         console.error("Erro ao carregar ordens:", erro);
 
         mensagem.textContent =
             "Não foi possível carregar as ordens de serviço.";
     });
-
 });
