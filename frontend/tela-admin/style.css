@@ -1,4 +1,22 @@
-/* Estrutura geral e identidade visual da TechFlow */
+/* ==========================================
+   TECHFLOW OS
+   PAINEL ADMINISTRATIVO
+   ESTILOS E RESPONSIVIDADE
+========================================== */
+
+:root {
+    --tf-fundo: #f3f7fb;
+    --tf-branco: #ffffff;
+    --tf-azul-escuro: #15354f;
+    --tf-azul: #176c9e;
+    --tf-azul-claro: #eaf4fb;
+    --tf-ciano: #1598bd;
+    --tf-verde: #278b7e;
+    --tf-texto: #516a80;
+    --tf-texto-suave: #72869a;
+    --tf-borda: #dfe8f0;
+    --tf-sombra: 0 4px 18px rgba(20, 55, 85, 0.035);
+}
 
 html {
     scroll-behavior: smooth;
@@ -6,7 +24,7 @@ html {
 }
 
 body {
-    background: #f3f7fb;
+    background: var(--tf-fundo);
 }
 
 svg {
@@ -15,21 +33,29 @@ svg {
     flex-shrink: 0;
 }
 
+/* ==========================================
+   ESTRUTURA GERAL
+========================================== */
+
 .estrutura {
     display: flex;
     min-height: 100vh;
 }
 
-/* Menu lateral */
+/* ==========================================
+   MENU LATERAL
+========================================== */
 
 .menu-lateral {
     width: 238px;
     flex-shrink: 0;
     padding: 30px 20px 24px;
-    background: #ffffff;
-    border-right: 1px solid #dfe8f0;
+    background: var(--tf-branco);
+    border-right: 1px solid var(--tf-borda);
+
     display: flex;
     flex-direction: column;
+
     position: sticky;
     top: 0;
     height: 100vh;
@@ -37,7 +63,14 @@ svg {
 }
 
 .marca {
+    display: inline-flex;
+    align-items: center;
     font-size: 25px;
+}
+
+.marca img {
+    max-width: 100%;
+    height: auto;
 }
 
 .perfil-lateral {
@@ -53,24 +86,30 @@ svg {
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 38px;
     height: 38px;
+
     border-radius: 50%;
     background: #e7f2fb;
-    color: #176c9e;
+    color: var(--tf-azul);
+
     font-size: 12px;
     font-weight: 700;
     flex-shrink: 0;
 }
 
 .perfil-lateral strong {
+    display: block;
     font-size: 12px;
+    color: var(--tf-azul-escuro);
 }
 
 .perfil-lateral small {
     display: block;
     font-size: 10px;
-    color: #72869a;
+    color: var(--tf-texto-suave);
+    margin-top: 3px;
 }
 
 .nome-menu {
@@ -80,39 +119,51 @@ svg {
     margin: 28px 12px 12px;
 }
 
-nav {
+.menu-lateral nav {
     display: flex;
     flex-direction: column;
     gap: 7px;
 }
 
-nav a,
+.menu-lateral nav a,
 .sair {
     display: flex;
     gap: 12px;
     align-items: center;
+
     padding: 12px;
     font-size: 12px;
     color: #607387;
+
     border-radius: 7px;
-}
-
-nav a:hover,
-nav .selecionado {
-    background: #eaf4fb;
-    color: #17679c;
     text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
-nav .selecionado {
-    box-shadow: inset 3px 0 #1598bd;
+.menu-lateral nav a:hover,
+.menu-lateral nav .selecionado {
+    background: var(--tf-azul-claro);
+    color: #17679c;
+}
+
+.menu-lateral nav .selecionado {
+    box-shadow: inset 3px 0 var(--tf-ciano);
     font-weight: 700;
 }
 
 .nota-menu {
     margin-top: auto;
     padding: 20px 14px;
-    background: linear-gradient(135deg, #eff9fc, #f1f5fb);
+
+    background: linear-gradient(
+        135deg,
+        #eff9fc,
+        #f1f5fb
+    );
+
     border: 1px solid #e1edf4;
     border-radius: 9px;
 }
@@ -137,7 +188,14 @@ nav .selecionado {
     margin-top: 20px;
 }
 
-/* Boas-vindas e indicadores */
+.sair:hover {
+    background: #fff1f2;
+    color: #a33e4c;
+}
+
+/* ==========================================
+   CONTEÚDO PRINCIPAL
+========================================== */
 
 .conteudo {
     flex: 1;
@@ -157,7 +215,7 @@ nav .selecionado {
 h1 {
     font-size: 29px;
     letter-spacing: -0.8px;
-    color: #15354f;
+    color: var(--tf-azul-escuro);
     margin: 6px 0;
 }
 
@@ -183,13 +241,26 @@ h2 {
 
 .aviso {
     font-size: 10px;
-    color: #72869a;
+    color: var(--tf-texto-suave);
+    line-height: 1.6;
 }
 
 .botao {
     font-size: 12px;
     padding: 10px 18px;
+    transition:
+        filter 0.2s ease,
+        transform 0.2s ease;
 }
+
+.botao:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   INDICADORES
+========================================== */
 
 .resumos {
     display: flex;
@@ -199,21 +270,27 @@ h2 {
 
 .resumo {
     display: flex;
+    align-items: center;
     gap: 18px;
     flex: 1;
-    align-items: center;
+    min-width: 0;
+
     padding: 23px;
     border: 1px solid #dfe8ef;
     border-radius: 10px;
-    background: white;
+
+    background: var(--tf-branco);
+    box-shadow: var(--tf-sombra);
 }
 
 .icone-resumo {
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 46px;
     height: 46px;
+
     border-radius: 11px;
     background: #eaf3fc;
     color: #2c70a7;
@@ -227,7 +304,7 @@ h2 {
 
 .resumo:nth-child(3) .icone-resumo {
     background: #e9f5f3;
-    color: #278b7e;
+    color: var(--tf-verde);
 }
 
 .resumo p {
@@ -247,7 +324,9 @@ h2 {
     color: #7f90a0;
 }
 
-/* Visão geral, progresso e tabelas */
+/* ==========================================
+   VISÃO GERAL
+========================================== */
 
 .linha-visao {
     display: flex;
@@ -258,10 +337,11 @@ h2 {
 .quadro,
 .painel-ordens,
 .painel-tecnicos {
-    background: white;
-    border: 1px solid #dfe8f0;
+    background: var(--tf-branco);
+    border: 1px solid var(--tf-borda);
     border-radius: 11px;
     overflow: hidden;
+    box-shadow: var(--tf-sombra);
 }
 
 .visao-sistema {
@@ -288,10 +368,20 @@ h2 {
     white-space: nowrap;
 }
 
+/* ==========================================
+   RITMO DA EQUIPE
+========================================== */
+
 .andamento-equipe {
     flex: 1;
     padding: 26px;
-    background: linear-gradient(135deg, #153e63, #0e2c47);
+
+    background: linear-gradient(
+        135deg,
+        #153e63,
+        #0e2c47
+    );
+
     color: white;
 }
 
@@ -311,6 +401,7 @@ h2 {
     display: flex;
     align-items: baseline;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .indicador-progresso strong {
@@ -349,10 +440,15 @@ progress::-moz-progress-bar {
     color: #c0d6e6;
 }
 
+/* ==========================================
+   ORDENS DE SERVIÇO
+========================================== */
+
 .cabecalho-secao {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     margin: 36px 0 16px;
 }
 
@@ -377,6 +473,10 @@ progress::-moz-progress-bar {
     font-size: 14px;
 }
 
+.pesquisa {
+    min-width: 0;
+}
+
 .pesquisa label {
     display: block;
     font-size: 10px;
@@ -388,20 +488,47 @@ progress::-moz-progress-bar {
     width: 205px;
 }
 
+.pesquisa select {
+    min-width: 175px;
+}
+
+/* ==========================================
+   CAMPOS DE FORMULÁRIO
+========================================== */
+
 input,
 select,
 textarea {
     border: 1px solid #cfdeea;
     padding: 10px 12px;
     border-radius: 6px;
+
     background: white;
     color: #29465f;
     font-size: 12px;
+
     max-width: 100%;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--tf-ciano);
+    outline-offset: 1px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #8b9bac;
+}
+
+/* ==========================================
+   TABELAS
+========================================== */
+
 .rolagem-tabela {
     overflow-x: auto;
+    max-width: 100%;
 }
 
 table {
@@ -421,8 +548,10 @@ caption {
 th {
     background: #f7fafd;
     color: #7b8fa3;
+
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
     font-size: 9px;
     font-weight: 700;
 }
@@ -431,6 +560,7 @@ th,
 td {
     padding: 15px 22px;
     border-top: 1px solid #edf2f6;
+    vertical-align: middle;
 }
 
 td {
@@ -445,35 +575,105 @@ td:first-child {
     white-space: nowrap;
 }
 
+tbody tr:hover {
+    background: #f9fcff;
+}
+
 .tabela-os {
-    min-width: 790px;
+    min-width: 850px;
 }
 
 .visao-sistema table {
     min-width: 360px;
 }
 
+/* ==========================================
+   STATUS DAS ORDENS
+========================================== */
+
 .situacao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 10px;
+    border-radius: 20px;
+
     font-size: 10px;
-    padding: 3px 9px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
 }
 
+/* Aberta / Em análise / Pendente */
+
+.situacao.pendente {
+    background: #eaf4ff;
+    color: #2566a2;
+}
+
+/* Em andamento / Aguardando peça */
+
+.situacao.andamento {
+    background: #fff4df;
+    color: #9a650c;
+}
+
+/* Concluída */
+
+.situacao.concluida {
+    background: #e9f7f0;
+    color: #257b5c;
+}
+
+/* Cancelada */
+
+.situacao.cancelada {
+    background: #f1f2f4;
+    color: #606773;
+}
+
+/* ==========================================
+   AÇÕES DAS TABELAS
+========================================== */
+
 .acoes-tabela {
-    min-width: 175px;
+    min-width: 230px;
+    max-width: none;
+
+    vertical-align: middle;
 }
 
 .acoes-tabela button {
-    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 3px;
+    white-space: nowrap;
 }
 
 .botao-detalhes,
 .botao-excluir {
     font-size: 10px;
-    padding: 6px 8px;
+    padding: 7px 10px;
+
     border: 1px solid #dce8f1;
     background: #f7fbff;
     color: #246b9c;
-    border-radius: 5px;
+
+    border-radius: 6px;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.botao-detalhes:hover:not(:disabled) {
+    background: #e6f2fb;
+    border-color: #bad7ec;
 }
 
 .botao-excluir {
@@ -482,21 +682,31 @@ td:first-child {
     border-color: #f3e0e4;
 }
 
-.botao-detalhes:hover {
-    background: #e6f2fb;
+.botao-excluir:hover:not(:disabled) {
+    background: #ffe9ed;
+    border-color: #e8b9c2;
+}
+
+.botao-detalhes:active,
+.botao-excluir:active {
+    transform: scale(0.98);
 }
 
 .mensagem {
     font-size: 11px;
+    color: var(--tf-texto-suave);
     padding: 0 22px 18px;
 }
 
-/* Técnicos, clientes e equipamentos */
+/* ==========================================
+   GERENCIAMENTO DE TÉCNICOS
+========================================== */
 
 .painel-tecnicos {
     display: flex;
     flex-direction: column;
     gap: 18px;
+
     padding: 24px;
     margin-top: 26px;
 }
@@ -506,41 +716,83 @@ td:first-child {
 }
 
 .formulario-tecnico {
-    max-width: 460px;
+    max-width: 820px;
+    width: 100%;
 }
 
-.formulario-tecnico label {
-    display: block;
-    font-size: 11px;
-    margin-bottom: 5px;
+.campos-tecnico {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px 18px;
 }
 
-.linha-tecnico {
-    display: flex;
-    gap: 10px;
-}
-
-.linha-tecnico input {
+.campo-tecnico {
     min-width: 0;
-    flex: 1;
+}
+
+.campo-tecnico-largo {
+    grid-column: 1 / -1;
+}
+
+.formulario-tecnico .campo-tecnico label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    color: #516a80;
+}
+
+.formulario-tecnico .campo-tecnico input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.acoes-cadastro-tecnico {
+    margin-top: 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex-wrap: wrap;
+}
+
+.acoes-cadastro-tecnico .aviso {
+    max-width: 450px;
 }
 
 .lista-tecnicos {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+
     list-style: none;
+    padding-left: 0;
 }
 
 .lista-tecnicos li {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 10px 14px;
+    flex-wrap: wrap;
+
+    gap: 12px;
+    padding: 12px 14px;
+
     background: #f3f8fc;
+    border: 1px solid #e5eef5;
     border-radius: 7px;
+
     font-size: 12px;
 }
+
+.lista-tecnicos li > span:first-child {
+    color: #29465f;
+    font-weight: 600;
+}
+
+/* ==========================================
+   CLIENTES E EQUIPAMENTOS
+========================================== */
 
 .consultas {
     display: flex;
@@ -556,6 +808,7 @@ td:first-child {
 .lista-consulta {
     list-style: none;
     padding: 0 24px 15px;
+
     max-height: 250px;
     overflow-y: auto;
 }
@@ -564,8 +817,10 @@ td:first-child {
     display: flex;
     flex-direction: column;
     gap: 3px;
+
     padding: 12px 0;
     border-top: 1px solid #edf2f6;
+
     overflow-wrap: anywhere;
 }
 
@@ -579,36 +834,57 @@ td:first-child {
     color: #7b8fa3;
 }
 
+/* ==========================================
+   RODAPÉ
+========================================== */
+
 .rodape-painel {
     display: flex;
     justify-content: space-between;
     gap: 20px;
+
     padding: 28px 0 0;
+
     font-size: 10px;
     color: #8294a5;
 }
 
-/* Janelas de consulta e edição */
+/* ==========================================
+   JANELAS DE EDIÇÃO E CONSULTA
+========================================== */
 
 dialog {
     margin: auto;
     padding: 28px;
+
     width: min(560px, 92%);
     max-height: 88vh;
+
     overflow-y: auto;
+
     border: 1px solid #dce6ee;
     border-radius: 12px;
+
+    background: white;
     color: #29465f;
+
+    box-shadow: 0 18px 60px rgba(10, 35, 60, 0.18);
 }
 
 dialog::backdrop {
-    background: #102a46a6;
+    background: rgba(16, 42, 70, 0.65);
+}
+
+dialog h2 {
+    font-size: 19px;
+    margin-bottom: 12px;
 }
 
 dialog p {
     font-size: 13px;
     margin: 13px 0;
     overflow-wrap: anywhere;
+    line-height: 1.6;
 }
 
 dialog button {
@@ -625,17 +901,44 @@ dialog input,
 dialog select,
 dialog textarea {
     width: 100%;
+    box-sizing: border-box;
 }
 
 .acoes-editor {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
 }
 
-/* Responsividade */
+/* ==========================================
+   ACESSIBILIDADE
+========================================== */
+
+button:disabled,
+input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--tf-ciano);
+    outline-offset: 3px;
+}
+
+.rolagem-tabela:focus-visible {
+    outline: 2px solid var(--tf-ciano);
+    outline-offset: -2px;
+}
+
+/* ==========================================
+   RESPONSIVIDADE - ATÉ 1100px
+========================================== */
 
 @media (max-width: 1100px) {
+
     .menu-lateral {
         width: 210px;
         padding: 24px 14px;
@@ -663,7 +966,12 @@ dialog textarea {
     }
 }
 
+/* ==========================================
+   RESPONSIVIDADE - ATÉ 800px
+========================================== */
+
 @media (max-width: 800px) {
+
     .estrutura {
         flex-direction: column;
     }
@@ -672,7 +980,10 @@ dialog textarea {
         width: 100%;
         height: auto;
         position: static;
+
         padding: 18px 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--tf-borda);
     }
 
     .perfil-lateral,
@@ -681,19 +992,19 @@ dialog textarea {
         display: none;
     }
 
-    nav {
+    .menu-lateral nav {
         flex-direction: row;
         flex-wrap: wrap;
         margin-top: 12px;
         gap: 4px;
     }
 
-    nav a {
+    .menu-lateral nav a {
         padding: 8px;
         font-size: 11px;
     }
 
-    nav svg {
+    .menu-lateral nav svg {
         width: 16px;
         height: 16px;
     }
@@ -746,7 +1057,61 @@ dialog textarea {
     }
 }
 
+/* ==========================================
+   RESPONSIVIDADE - ATÉ 600px
+========================================== */
+
+@media (max-width: 600px) {
+
+    .campos-tecnico {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-tecnico-largo {
+        grid-column: auto;
+    }
+
+    .titulo-tabela {
+        align-items: stretch;
+    }
+
+    .pesquisa {
+        width: 100%;
+    }
+
+    .pesquisa input,
+    .pesquisa select {
+        width: 100%;
+    }
+
+    .titulo-quadro {
+        padding: 18px;
+    }
+
+    .painel-tecnicos {
+        padding: 18px;
+    }
+
+    .lista-tecnicos li {
+        width: 100%;
+    }
+
+    .acoes-cadastro-tecnico {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* ==========================================
+   RESPONSIVIDADE - ATÉ 420px
+========================================== */
+
 @media (max-width: 420px) {
+
+    .conteudo {
+        padding: 18px 13px;
+    }
+
     .icone-resumo {
         width: 35px;
         height: 35px;
@@ -758,93 +1123,53 @@ dialog textarea {
 
     .resumo {
         padding: 14px;
-    }
-
-    .linha-tecnico {
-        flex-direction: column;
+        min-width: 100%;
     }
 
     .acoes-editor {
         flex-direction: column;
     }
 
+    .acoes-editor button {
+        width: 100%;
+    }
+
     .titulo-quadro {
-        padding: 18px;
+        padding: 16px;
+    }
+
+    .cabecalho-secao {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .topo-painel .botao {
+        max-width: 100%;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    dialog {
+        padding: 20px;
     }
 }
 
-/* Filtro visual da tabela */
+/* ==========================================
+   ACESSIBILIDADE - MOVIMENTO REDUZIDO
+========================================== */
 
-body:has(#filtro-status option[value="pendente"]:checked)
-.linha-os:not(.pendente),
+@media (prefers-reduced-motion: reduce) {
 
-body:has(#filtro-status option[value="andamento"]:checked)
-.linha-os:not(.andamento),
-
-body:has(#filtro-status option[value="concluida"]:checked)
-.linha-os:not(.concluida) {
-    display: none;
-}
-
-button:disabled,
-input:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Novo formulário completo de técnicos */
-
-.formulario-tecnico {
-    max-width: 820px;
-    width: 100%;
-}
-
-.campos-tecnico {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px 18px;
-}
-
-.campo-tecnico {
-    min-width: 0;
-}
-
-.campo-tecnico-largo {
-    grid-column: 1 / -1;
-}
-
-.formulario-tecnico .campo-tecnico label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 11px;
-    color: #516a80;
-}
-
-.formulario-tecnico .campo-tecnico input {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.formulario-tecnico .campo-tecnico input:focus {
-    outline: 2px solid #1598bd;
-    outline-offset: 1px;
-}
-
-.acoes-cadastro-tecnico {
-    margin-top: 16px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 600px) {
-    .campos-tecnico {
-        grid-template-columns: 1fr;
+    html {
+        scroll-behavior: auto;
     }
 
-    .campo-tecnico-largo {
-        grid-column: auto;
+    .botao,
+    .botao-detalhes,
+    .botao-excluir,
+    .menu-lateral nav a {
+        transition: none;
     }
 }

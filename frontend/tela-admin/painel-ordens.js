@@ -1,17 +1,20 @@
 /* ==========================================
-   TECHFLOW OS - GERENCIAMENTO DE ORDENS
-   Painel do Administrador
-   ========================================== */
+   TECHFLOW OS
+   GERENCIAMENTO DE ORDENS DE SERVIÇO
+   PAINEL ADMINISTRATIVO
+========================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+
     // ======================================
-    // ELEMENTOS DO PAINEL
+    // ELEMENTOS
     // ======================================
 
     const tabela = document.getElementById("lista-ordens");
     const recentes = document.getElementById("ordens-recentes");
     const mensagem = document.getElementById("mensagem");
     const filtro = document.getElementById("filtro-status");
+    const busca = document.getElementById("busca");
 
     const token = sessionStorage.getItem("techflow_token");
 
@@ -29,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================
 
     async function consultarAPI(caminho, metodo = "GET", corpo = null) {
+
         const opcoes = {
             method: metodo,
             headers: {
@@ -51,7 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 dados = JSON.parse(texto);
             } catch {
-                throw new Error("A API retornou uma resposta inválida.");
+                throw new Error(
+                    "A API retornou uma resposta inválida."
+                );
             }
         }
 
@@ -65,12 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // FUNÇÕES AUXILIARES
+    // STATUS
     // ======================================
 
     function classeStatus(status) {
+
         if (status === "Concluída") {
             return "concluida";
+        }
+
+        if (status === "Cancelada") {
+            return "cancelada";
         }
 
         if (
@@ -87,41 +98,37 @@ document.addEventListener("DOMContentLoaded", () => {
         return ["Concluída", "Cancelada"].includes(os.statusOS);
     }
 
-    function obterNomeCliente(id) {
-        if (id == null) {
-            return "Não informado";
-        }
+    // ======================================
+    // INFORMAÇÕES AUXILIARES
+    // ======================================
 
-        return nomesClientes.get(String(id)) || `Cliente #${id}`;
+    function obterNomeCliente(id) {
+        if (id == null) return "Não informado";
+
+        return nomesClientes.get(String(id)) ||
+            `Cliente #${id}`;
     }
 
     function obterNomeTecnico(id) {
-        if (id == null) {
-            return "Não atribuído";
-        }
+        if (id == null) return "Não atribuído";
 
-        return nomesTecnicos.get(String(id)) || `Técnico #${id}`;
+        return nomesTecnicos.get(String(id)) ||
+            `Técnico #${id}`;
     }
 
-    // CORREÇÃO:
-    // Mostrar o nome real do equipamento,
-    // em vez de apresentar somente o ID.
     function obterNomeEquipamento(os) {
+
         const nome = String(os.nomeEquipamento || "").trim();
         const marca = String(os.marcaEquipamento || "").trim();
         const modelo = String(os.modeloEquipamento || "").trim();
 
-        if (nome) {
-            return nome;
-        }
+        if (nome) return nome;
 
         const descricao = [marca, modelo]
             .filter(Boolean)
             .join(" ");
 
-        if (descricao) {
-            return descricao;
-        }
+        if (descricao) return descricao;
 
         if (os.idEquipamento != null) {
             return `Equipamento #${os.idEquipamento}`;
@@ -131,38 +138,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function criarCelula(linha, texto) {
+
         const celula = document.createElement("td");
+
         celula.textContent = texto ?? "Não informado";
+
         linha.appendChild(celula);
+
         return celula;
     }
 
     function adicionarStatus(linha, status) {
+
         const celula = document.createElement("td");
         const etiqueta = document.createElement("span");
 
         etiqueta.className = `situacao ${classeStatus(status)}`;
         etiqueta.textContent = status || "Não informado";
 
+        // Diferenciar cancelamento mesmo antes
+        // de adicionar a classe ao CSS.
+        if (status === "Cancelada") {
+            etiqueta.style.backgroundColor = "#f1f2f4";
+            etiqueta.style.color = "#606773";
+        }
+
         celula.appendChild(etiqueta);
         linha.appendChild(celula);
     }
 
     function criarBotao(texto, acao) {
+
         const botao = document.createElement("button");
 
         botao.type = "button";
         botao.className = "botao-detalhes";
         botao.textContent = texto;
+
         botao.addEventListener("click", acao);
 
         return botao;
     }
 
     function formatarData(data) {
-        if (!data) {
-            return "Data não informada";
-        }
+
+        if (!data) return "Data não informada";
 
         const texto = String(data);
 
@@ -185,11 +205,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function informarErro(erro) {
+        console.error("TechFlow:", erro);
+        mensagem.textContent = erro.message;
+    }
+
     // ======================================
-    // DETALHES DA ORDEM DE SERVIÇO
+    // DETALHES DA OS
     // ======================================
 
     function mostrarDetalhes(os) {
+
         const detalhes = [
             `Ordem de Serviço #${os.idOS}`,
             "",
@@ -208,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // JANELA PADRÃO COM SELEÇÃO
+    // JANELA DE SELEÇÃO
     // ======================================
 
     function criarJanelaSelecao(
@@ -217,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
         textoCampo,
         textoSalvar
     ) {
+
         const janela = document.createElement("dialog");
         janela.id = id;
 
@@ -233,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selecionar = document.createElement("select");
         selecionar.id = `${id}-selecao`;
         selecionar.required = true;
+
         label.htmlFor = selecionar.id;
 
         const acoes = document.createElement("div");
@@ -272,6 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function adicionarOpcao(select, valor, texto) {
+
         const opcao = document.createElement("option");
 
         opcao.value = valor;
@@ -283,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // ATRIBUIÇÃO DE TÉCNICOS
+    // ATRIBUIÇÃO DE TÉCNICO
     // ======================================
 
     const atribuicao = criarJanelaSelecao(
@@ -296,21 +325,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemAtribuicao = null;
 
     function abrirAtribuicao(os) {
+
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
         }
 
         if (tecnicosAtivos.length === 0) {
-            mensagem.textContent = "Nenhum técnico ativo disponível.";
+            mensagem.textContent =
+                "Nenhum técnico ativo disponível.";
             return;
         }
 
         ordemAtribuicao = os;
 
-        atribuicao.titulo.textContent = os.idTecnico == null
-            ? "Atribuir técnico"
-            : "Alterar técnico responsável";
+        atribuicao.titulo.textContent =
+            os.idTecnico == null
+                ? "Atribuir técnico"
+                : "Alterar técnico responsável";
 
         atribuicao.descricao.textContent =
             `OS #${os.idOS} - ${obterNomeCliente(os.idCliente)}`;
@@ -335,7 +367,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const atualAtivo = tecnicosAtivos.some(
             tecnico =>
-                String(tecnico.idUsuario) === String(os.idTecnico)
+                String(tecnico.idUsuario) ===
+                String(os.idTecnico)
         );
 
         atribuicao.selecionar.value = atualAtivo
@@ -348,11 +381,10 @@ document.addEventListener("DOMContentLoaded", () => {
     atribuicao.formulario.addEventListener(
         "submit",
         async evento => {
+
             evento.preventDefault();
 
-            if (!ordemAtribuicao) {
-                return;
-            }
+            if (!ordemAtribuicao) return;
 
             const idTecnico = Number(
                 atribuicao.selecionar.value
@@ -367,7 +399,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (
-                Number(ordemAtribuicao.idTecnico) === idTecnico
+                Number(ordemAtribuicao.idTecnico) ===
+                idTecnico
             ) {
                 alert("Este técnico já está atribuído à OS.");
                 return;
@@ -377,6 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
             atribuicao.salvar.textContent = "Salvando...";
 
             try {
+
                 const idOS = ordemAtribuicao.idOS;
 
                 await consultarAPI(
@@ -393,14 +427,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     `Técnico atribuído com sucesso à OS #${idOS}!`;
 
             } catch (erro) {
-                console.error(
-                    "Erro ao atribuir técnico:",
-                    erro
-                );
 
+                informarErro(erro);
                 alert(erro.message);
 
             } finally {
+
                 atribuicao.salvar.disabled = false;
                 atribuicao.salvar.textContent =
                     "Salvar atribuição";
@@ -422,6 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemStatus = null;
 
     function abrirAlteracaoStatus(os) {
+
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
@@ -471,19 +504,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         statusJanela.selecionar.value = "";
+
         statusJanela.janela.showModal();
     }
 
     statusJanela.formulario.addEventListener(
         "submit",
         async evento => {
+
             evento.preventDefault();
 
-            if (!ordemStatus) {
-                return;
-            }
+            if (!ordemStatus) return;
 
-            const novoStatus = statusJanela.selecionar.value;
+            const novoStatus =
+                statusJanela.selecionar.value;
 
             if (
                 !novoStatus ||
@@ -497,6 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
             statusJanela.salvar.textContent = "Salvando...";
 
             try {
+
                 const idOS = ordemStatus.idOS;
 
                 await consultarAPI(
@@ -513,42 +548,51 @@ document.addEventListener("DOMContentLoaded", () => {
                     `Status da OS #${idOS} atualizado para ${novoStatus}!`;
 
             } catch (erro) {
-                console.error("Erro ao alterar status:", erro);
+
+                informarErro(erro);
                 alert(erro.message);
 
             } finally {
+
                 statusJanela.salvar.disabled = false;
-                statusJanela.salvar.textContent = "Salvar status";
+                statusJanela.salvar.textContent =
+                    "Salvar status";
             }
         }
     );
 
     // ======================================
-    // DIAGNÓSTICO E SOLUÇÃO APLICADA
+    // DIAGNÓSTICO E SOLUÇÃO
     // ======================================
 
-    const janelaDiagnostico = document.createElement("dialog");
+    const janelaDiagnostico =
+        document.createElement("dialog");
+
     janelaDiagnostico.id = "janela-diagnostico";
 
-    const tituloDiagnostico = document.createElement("h2");
+    const tituloDiagnostico =
+        document.createElement("h2");
+
     tituloDiagnostico.textContent =
         "Registrar diagnóstico e solução";
 
-    const descricaoDiagnostico = document.createElement("p");
+    const descricaoDiagnostico =
+        document.createElement("p");
 
-    const formularioDiagnostico = document.createElement("form");
+    const formularioDiagnostico =
+        document.createElement("form");
 
     function criarCampoTexto(id, rotulo, placeholder) {
+
         const label = document.createElement("label");
         label.htmlFor = id;
         label.textContent = rotulo;
 
         const campo = document.createElement("textarea");
+
         campo.id = id;
         campo.rows = 4;
         campo.placeholder = placeholder;
-
-        // Apenas o diagnóstico é obrigatório.
         campo.required = id === "campo-diagnostico";
 
         formularioDiagnostico.appendChild(label);
@@ -569,7 +613,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "Descreva os procedimentos realizados."
     );
 
-    const acoesDiagnostico = document.createElement("div");
+    const acoesDiagnostico =
+        document.createElement("div");
+
     acoesDiagnostico.className = "acoes-editor";
 
     const cancelarDiagnostico = criarBotao(
@@ -577,7 +623,9 @@ document.addEventListener("DOMContentLoaded", () => {
         () => janelaDiagnostico.close()
     );
 
-    const salvarDiagnostico = document.createElement("button");
+    const salvarDiagnostico =
+        document.createElement("button");
+
     salvarDiagnostico.type = "submit";
     salvarDiagnostico.className = "botao";
     salvarDiagnostico.textContent = "Salvar diagnóstico";
@@ -596,6 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let ordemDiagnostico = null;
 
     function abrirDiagnostico(os) {
+
         if (osFinalizada(os)) {
             mensagem.textContent = "Esta OS já está finalizada.";
             return;
@@ -615,11 +664,10 @@ document.addEventListener("DOMContentLoaded", () => {
     formularioDiagnostico.addEventListener(
         "submit",
         async evento => {
+
             evento.preventDefault();
 
-            if (!ordemDiagnostico) {
-                return;
-            }
+            if (!ordemDiagnostico) return;
 
             const diagnostico =
                 campoDiagnostico.value.trim();
@@ -636,15 +684,13 @@ document.addEventListener("DOMContentLoaded", () => {
             salvarDiagnostico.textContent = "Salvando...";
 
             try {
+
                 const idOS = ordemDiagnostico.idOS;
 
                 await consultarAPI(
                     `/api/ordens-servico/${idOS}/diagnostico`,
                     "PATCH",
-                    {
-                        diagnostico,
-                        solucaoAplicada
-                    }
+                    { diagnostico, solucaoAplicada }
                 );
 
                 janelaDiagnostico.close();
@@ -655,14 +701,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     `Diagnóstico da OS #${idOS} registrado com sucesso!`;
 
             } catch (erro) {
-                console.error(
-                    "Erro ao salvar diagnóstico:",
-                    erro
-                );
 
+                informarErro(erro);
                 alert(erro.message);
 
             } finally {
+
                 salvarDiagnostico.disabled = false;
                 salvarDiagnostico.textContent =
                     "Salvar diagnóstico";
@@ -671,22 +715,31 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     // ======================================
-    // JANELA DE HISTÓRICO
+    // HISTÓRICO DA OS
     // ======================================
 
-    const janelaHistorico = document.createElement("dialog");
+    const janelaHistorico =
+        document.createElement("dialog");
+
     janelaHistorico.id = "janela-historico-os";
 
-    const tituloHistorico = document.createElement("h2");
+    const tituloHistorico =
+        document.createElement("h2");
+
     tituloHistorico.textContent =
         "Histórico da Ordem de Serviço";
 
-    const descricaoHistorico = document.createElement("p");
+    const descricaoHistorico =
+        document.createElement("p");
 
-    const listaHistorico = document.createElement("ol");
+    const listaHistorico =
+        document.createElement("ol");
+
     listaHistorico.style.paddingLeft = "22px";
 
-    const acoesHistorico = document.createElement("div");
+    const acoesHistorico =
+        document.createElement("div");
+
     acoesHistorico.className = "acoes-editor";
 
     const fecharHistorico = criarBotao(
@@ -703,11 +756,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.body.appendChild(janelaHistorico);
 
-    // ======================================
-    // CONSULTAR HISTÓRICO DA OS
-    // ======================================
-
     async function abrirHistorico(os) {
+
         tituloHistorico.textContent =
             `Histórico da OS #${os.idOS}`;
 
@@ -721,10 +771,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         listaHistorico.appendChild(carregando);
 
-        fecharHistorico.disabled = false;
         janelaHistorico.showModal();
 
         try {
+
             const historico = await consultarAPI(
                 `/api/ordens-servico/${os.idOS}/historico`
             );
@@ -738,7 +788,9 @@ document.addEventListener("DOMContentLoaded", () => {
             listaHistorico.replaceChildren();
 
             if (historico.length === 0) {
+
                 const item = document.createElement("li");
+
                 item.textContent =
                     "Nenhuma alteração registrada.";
 
@@ -747,20 +799,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             historico.forEach(registro => {
+
                 const item = document.createElement("li");
                 item.style.marginBottom = "18px";
 
                 const statusNovo = document.createElement("strong");
+
                 statusNovo.textContent =
                     registro.statusNovo || "Não informado";
 
                 const statusAnterior = document.createElement("p");
+
                 statusAnterior.textContent =
                     registro.statusAnterior == null
                         ? "Criação da Ordem de Serviço"
                         : `Status anterior: ${registro.statusAnterior}`;
 
                 const data = document.createElement("small");
+
                 data.textContent =
                     `Data: ${formatarData(registro.dataAlteracao)}`;
 
@@ -772,11 +828,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (erro) {
+
             console.error("Erro ao carregar histórico:", erro);
 
             listaHistorico.replaceChildren();
 
             const item = document.createElement("li");
+
             item.textContent =
                 `Não foi possível carregar o histórico: ${erro.message}`;
 
@@ -785,18 +843,94 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
+    // BUSCA E FILTROS
+    // ======================================
+
+    function normalizarTexto(texto) {
+
+        return String(texto ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
+function correspondeBusca(os) {
+
+    if (!busca) {
+        return true;
+    }
+
+    const termo = normalizarTexto(busca.value);
+
+    // Campo vazio: mostrar todas as OS
+    // permitidas pelo filtro de status.
+    if (!termo) {
+        return true;
+    }
+
+    // ======================================
+    // PESQUISA POR NÚMERO DA OS
+    // ======================================
+
+    // Aceita: 6, 7, 8, #6, #7, #8, 008.
+    // Números são comparados apenas ao ID.
+    if (/^#?\d+$/.test(termo)) {
+
+        const numeroPesquisado = Number(
+            termo.replace("#", "")
+        );
+
+        return Number(os.idOS) === numeroPesquisado;
+    }
+
+    // ======================================
+    // PESQUISA POR TEXTO
+    // ======================================
+
+    // Pesquisa cliente, técnico, equipamento,
+    // problema e status, ignorando acentos
+    // e diferenças entre maiúsculas/minúsculas.
+
+    const informacoes = [
+        obterNomeCliente(os.idCliente),
+        obterNomeTecnico(os.idTecnico),
+        obterNomeEquipamento(os),
+        os.descricaoProblema,
+        os.statusOS
+    ];
+
+    return normalizarTexto(
+        informacoes.join(" ")
+    ).includes(termo);
+}
+
+    function correspondeStatus(os) {
+
+        if (filtro.value === "todos") {
+            return true;
+        }
+
+        return classeStatus(os.statusOS) === filtro.value;
+    }
+
+    // ======================================
     // TABELA DE ORDENS
     // ======================================
 
     function atualizarTabela() {
+
         tabela.replaceChildren();
 
         const ordensFiltradas = todasOrdens.filter(os => {
-            return filtro.value === "todos" ||
-                classeStatus(os.statusOS) === filtro.value;
+            return (
+                correspondeStatus(os) &&
+                correspondeBusca(os)
+            );
         });
 
         ordensFiltradas.forEach(os => {
+
             const linha = document.createElement("tr");
 
             linha.className =
@@ -821,25 +955,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
             adicionarStatus(linha, os.statusOS);
 
-            const celulaAcoes = document.createElement("td");
+            const celulaAcoes =
+                document.createElement("td");
+
             celulaAcoes.className = "acoes-tabela";
 
-            // Detalhes da OS
+            // Detalhes
             celulaAcoes.appendChild(
                 criarBotao("Detalhes", () => {
                     mostrarDetalhes(os);
                 })
             );
 
-            // Histórico da OS
+            // Histórico
             celulaAcoes.appendChild(
                 criarBotao("Histórico", () => {
                     abrirHistorico(os);
                 })
             );
 
-            // Ações para ordens não finalizadas
+            // Ações somente para OS não finalizadas
             if (!osFinalizada(os)) {
+
                 celulaAcoes.appendChild(
                     criarBotao(
                         os.idTecnico == null
@@ -856,9 +993,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 celulaAcoes.appendChild(
-                    criarBotao("Registrar diagnóstico", () => {
-                        abrirDiagnostico(os);
-                    })
+                    criarBotao(
+                        "Registrar diagnóstico",
+                        () => abrirDiagnostico(os)
+                    )
                 );
             }
 
@@ -870,6 +1008,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `${ordensFiltradas.length} ordem(ns) encontrada(s).`;
 
         if (ordensFiltradas.length === 0) {
+
             const linha = document.createElement("tr");
             const celula = document.createElement("td");
 
@@ -882,17 +1021,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // ORDENS RECENTES
+    // ÚLTIMAS ORDENS
     // ======================================
 
     function atualizarRecentes() {
+
         recentes.replaceChildren();
 
         const ultimasOrdens = [...todasOrdens]
             .sort((a, b) => Number(b.idOS) - Number(a.idOS))
             .slice(0, 3);
 
+        if (ultimasOrdens.length === 0) {
+
+            const linha = document.createElement("tr");
+            const celula = document.createElement("td");
+
+            celula.colSpan = 3;
+
+            celula.textContent =
+                "Nenhuma Ordem de Serviço cadastrada.";
+
+            linha.appendChild(celula);
+            recentes.appendChild(linha);
+
+            return;
+        }
+
         ultimasOrdens.forEach(os => {
+
             const linha = document.createElement("tr");
 
             criarCelula(linha, `#${os.idOS}`);
@@ -909,25 +1066,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================
-    // CARREGAR DADOS REAIS DO MYSQL
+    // CARREGAR DADOS DO MYSQL
     // ======================================
 
     async function carregarDados() {
-        const [ordens, clientes, tecnicos] = await Promise.all([
-            consultarAPI("/api/ordens-servico"),
-            consultarAPI("/api/clientes"),
-            consultarAPI("/api/tecnicos")
-        ]);
+
+        const [ordens, clientes, tecnicos] =
+            await Promise.all([
+                consultarAPI("/api/ordens-servico"),
+                consultarAPI("/api/clientes"),
+                consultarAPI("/api/tecnicos")
+            ]);
 
         if (
             !Array.isArray(ordens) ||
             !Array.isArray(clientes) ||
             !Array.isArray(tecnicos)
         ) {
-            throw new Error("A API retornou dados inválidos.");
+            throw new Error(
+                "A API retornou dados inválidos."
+            );
         }
 
-        todasOrdens = ordens;
+        // As consultas normais já ocultam
+        // as OS excluídas logicamente.
+        // A filtragem adicional protege
+        // a visualização caso a API envie
+        // o campo excluidaEm.
+
+        todasOrdens = ordens.filter(
+            os => os.excluidaEm == null
+        );
 
         nomesClientes = new Map(
             clientes.map(cliente => [
@@ -959,12 +1128,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // INICIALIZAÇÃO
     // ======================================
 
-    filtro.addEventListener("change", atualizarTabela);
+    filtro.addEventListener(
+        "change",
+        atualizarTabela
+    );
+
+    // Ativar a busca já existente no HTML.
+    if (busca) {
+
+        busca.disabled = false;
+        busca.removeAttribute("title");
+
+        busca.placeholder =
+            "Buscar por ID, cliente, técnico ou problema";
+
+        busca.addEventListener(
+            "input",
+            atualizarTabela
+        );
+    }
 
     carregarDados().catch(erro => {
+
         console.error("Erro ao carregar ordens:", erro);
 
         mensagem.textContent =
-            "Não foi possível carregar as ordens de serviço.";
+            `Não foi possível carregar as ordens: ${erro.message}`;
     });
+
 });
