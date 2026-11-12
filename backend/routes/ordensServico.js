@@ -6,6 +6,48 @@ const express = require("express");
 const router = express.Router();
 const conexao = require("../database/conexao");
 
+/* ==========================================
+   PROTEÇÃO DAS OS EXCLUÍDAS
+   Impede PUT e PATCH em OS excluídas.
+   ========================================== */
+
+router.use(async (req, res, next) => {
+    try {
+        if (!["PUT", "PATCH"].includes(req.method)) {
+            return next();
+        }
+
+        const partes = req.path.split("/").filter(Boolean);
+        const idOS = partes[0];
+
+        if (!/^[1-9]\d*$/.test(idOS || "")) {
+            return next();
+        }
+
+        const [ordens] = await conexao.execute(
+            `SELECT excluidaEm
+             FROM OrdensServico
+             WHERE idOS = ?`,
+            [idOS]
+        );
+
+        if (ordens.length > 0 && ordens[0].excluidaEm !== null) {
+            return res.status(404).json({
+                mensagem: "Ordem de Serviço não encontrada."
+            });
+        }
+
+        return next();
+
+    } catch (erro) {
+        console.error("Erro ao verificar exclusão da OS:", erro);
+
+        return res.status(500).json({
+            mensagem: "Erro ao verificar Ordem de Serviço."
+        });
+    }
+});
+
 // ==============================================
 // VALIDAÇÕES E PERMISSÕES
 // ==============================================
@@ -96,7 +138,12 @@ router.get("/", async (req, res) => {
             return acessoNegado(res);
         }
 
-        sql += " ORDER BY os.idOS DESC";
+        // Não mostrar Ordens de Serviço excluídas
+sql += parametros.length > 0
+    ? " AND os.excluidaEm IS NULL"
+    : " WHERE os.excluidaEm IS NULL";
+
+sql += " ORDER BY os.idOS DESC";
 
         const [ordens] = await conexao.execute(
             sql,
@@ -132,7 +179,8 @@ router.get("/:id", async (req, res) => {
         }
 
         const [ordens] = await conexao.execute(
-            consultaCompletaOS + " WHERE os.idOS = ?",
+            consultaCompletaOS +
+    " WHERE os.idOS = ? AND os.excluidaEm IS NULL",
             [id]
         );
 
@@ -798,5 +846,11 @@ router.patch("/:id/diagnostico", async (req, res) => {
 // ==============================================
 // EXPORTAR ROTAS
 // ==============================================
+
+// ==========================================
+// ROTA DELETE - EXCLUSÃO LÓGICA DE OS
+// ==========================================
+
+router.use(require("./exclusaoOS"));
 
 module.exports = router;

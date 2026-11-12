@@ -1387,3 +1387,70 @@ Melhorias futuras poderão ser avaliadas em outras etapas, sem necessidade de am
 **TechFlow OS — Sistema de Gerenciamento de Ordens de Serviço**
 
 **Documentação Técnica da API REST — Sprint 2**
+
+---
+
+## Exclusão de Ordens de Serviço (DELETE)
+
+**Endpoint:** `DELETE /api/ordens-servico/:id`
+
+**Autenticação:** JWT obrigatório.
+
+**Permissão:** Somente administrador.
+
+### Funcionamento
+
+O TechFlow utiliza exclusão lógica para preservar
+o histórico dos atendimentos.
+
+Ao executar o DELETE:
+- A data da exclusão é registrada em `excluidaEm`.
+- O status da OS passa para `Cancelada`.
+- O registro permanece no banco de dados MySQL.
+- O histórico da OS é preservado.
+- A OS deixa de aparecer nas consultas normais.
+- A API impede alterações posteriores.
+
+### Regras
+
+- A OS deve estar `Aberta` ou `Cancelada`.
+- Não pode possuir técnico atribuído.
+- Ordens concluídas não podem ser excluídas.
+- Somente administradores podem executar a operação.
+
+### Exemplo de requisição
+
+DELETE /api/ordens-servico/9
+
+Authorization: Bearer TOKEN_JWT
+
+### Resposta de sucesso — HTTP 200
+
+{
+  "mensagem": "Ordem de Serviço excluída com sucesso!",
+  "idOS": 9,
+  "tipoExclusao": "logica"
+}
+
+### Possíveis respostas
+
+| HTTP | Significado |
+|---|---|
+| 200 | Exclusão realizada |
+| 400 | ID inválido ou OS não permite exclusão |
+| 401 | Usuário não autenticado |
+| 403 | Usuário sem permissão |
+| 404 | OS inexistente ou já excluída |
+| 500 | Erro interno |
+
+### Diferença entre cancelar e excluir
+
+PATCH /api/ordens-servico/:id/cancelar
+Cancela o atendimento, mantendo a OS consultável.
+
+DELETE /api/ordens-servico/:id
+Realiza exclusão lógica administrativa e oculta a OS
+das consultas normais.
+
+A exclusão física não é utilizada para evitar a perda
+dos dados e do histórico de atendimento.

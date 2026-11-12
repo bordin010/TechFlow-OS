@@ -1,6 +1,9 @@
-// ==============================================
-// TECHFLOW - ROTAS DE OCORRÊNCIAS
-// ==============================================
+/* ==============================================
+   TECHFLOW OS - ROTAS DE OCORRÊNCIAS
+
+   Registro e consulta de ocorrências
+   Proteção de exclusão lógica das OS
+   ============================================== */
 
 const express = require("express");
 const conexao = require("../database/conexao");
@@ -11,24 +14,34 @@ const router = express.Router();
 // VALIDAÇÕES
 // ==============================================
 
-const idValido = (id) => /^[1-9]\d*$/.test(String(id));
+const idValido = (id) =>
+    /^[1-9]\d*$/.test(String(id)) &&
+    Number.isSafeInteger(Number(id));
 
 function acessoNegado(res) {
     return res.status(403).json({
-        mensagem: "Você não tem permissão para acessar esta OS."
+        mensagem:
+            "Você não tem permissão para acessar esta OS."
     });
 }
 
+// Verificar se o usuário pode consultar a OS.
 function podeConsultarOS(os, usuario) {
-    return usuario.perfil === "administrador" ||
+    return (
+        usuario.perfil === "administrador" ||
+
         (
             usuario.perfil === "tecnico" &&
-            Number(os.idTecnico) === Number(usuario.idUsuario)
+            Number(os.idTecnico) ===
+            Number(usuario.idUsuario)
         ) ||
+
         (
             usuario.perfil === "cliente" &&
-            Number(os.idCliente) === Number(usuario.idUsuario)
-        );
+            Number(os.idCliente) ===
+            Number(usuario.idUsuario)
+        )
+    );
 }
 
 // ==============================================
@@ -40,25 +53,33 @@ router.post("/", async (req, res) => {
 
     const { idOS, descricao } = req.body || {};
 
-    // Somente técnicos registram ocorrências
-    if (req.usuario.perfil !== "tecnico") {
+    // Apenas técnicos podem registrar ocorrências.
+    if (
+        !req.usuario ||
+        req.usuario.perfil !== "tecnico"
+    ) {
         return res.status(403).json({
-            mensagem: "Somente técnicos podem registrar ocorrências."
+            mensagem:
+                "Somente técnicos podem registrar ocorrências."
         });
     }
 
+    // Validar ID da OS.
     if (!idValido(idOS)) {
         return res.status(400).json({
-            mensagem: "Informe uma Ordem de Serviço válida."
+            mensagem:
+                "Informe uma Ordem de Serviço válida."
         });
     }
 
+    // Validar descrição.
     if (
         typeof descricao !== "string" ||
         !descricao.trim()
     ) {
         return res.status(400).json({
-            mensagem: "Informe a descrição da ocorrência."
+            mensagem:
+                "Informe a descrição da ocorrência."
         });
     }
 
@@ -66,7 +87,8 @@ router.post("/", async (req, res) => {
 
     if (descricaoLimpa.length > 800) {
         return res.status(400).json({
-            mensagem: "A ocorrência deve ter no máximo 800 caracteres."
+            mensagem:
+                "A ocorrência deve ter no máximo 800 caracteres."
         });
     }
 
@@ -75,33 +97,55 @@ router.post("/", async (req, res) => {
     try {
 
         db = await conexao.getConnection();
-
         await db.beginTransaction();
 
-        // Bloquear a OS durante a verificação
+        // ======================================
+        // VERIFICAR A ORDEM DE SERVIÇO
+        // ======================================
+
+        // Bloquear o registro da OS durante a
+        // transação para evitar alterações simultâneas.
         const [ordens] = await db.execute(
             `SELECT
                 idOS,
+                idCliente,
                 idTecnico,
-                statusOS
+                statusOS,
+                excluidaEm
+
              FROM OrdensServico
+
              WHERE idOS = ?
+
              FOR UPDATE`,
             [idOS]
         );
 
-        if (ordens.length === 0) {
+        // ======================================
+        // PROTEÇÃO DE EXCLUSÃO LÓGICA
+        // ======================================
+
+        // Não permitir ocorrências em OS
+        // inexistentes ou excluídas.
+        if (
+            ordens.length === 0 ||
+            ordens[0].excluidaEm !== null
+        ) {
 
             await db.rollback();
 
             return res.status(404).json({
-                mensagem: "Ordem de Serviço não encontrada."
+                mensagem:
+                    "Ordem de Serviço não encontrada."
             });
         }
 
         const os = ordens[0];
 
-        // Verificar se a OS pertence ao técnico
+        // ======================================
+        // VERIFICAR O TÉCNICO RESPONSÁVEL
+        // ======================================
+
         if (
             Number(os.idTecnico) !==
             Number(req.usuario.idUsuario)
@@ -112,22 +156,38 @@ router.post("/", async (req, res) => {
             return acessoNegado(res);
         }
 
-        // Impedir ocorrências em serviços finalizados
+        // ======================================
+        // VERIFICAR STATUS DA OS
+        // ======================================
+
+        // Não permitir novas ocorrências quando
+        // o atendimento estiver finalizado.
         if (
-            ["Concluída", "Cancelada"].includes(os.statusOS)
+            ["Concluída", "Cancelada"].includes(
+                os.statusOS
+            )
         ) {
 
             await db.rollback();
 
             return res.status(400).json({
-                mensagem: "Não é permitido registrar ocorrências em uma OS finalizada."
+                mensagem:
+                    "Não é permitido registrar ocorrências em uma OS finalizada."
             });
         }
 
-        // Registrar ocorrência no MySQL
+        // ======================================
+        // REGISTRAR OCORRÊNCIA NO MYSQL
+        // ======================================
+
         const [resultado] = await db.execute(
             `INSERT INTO OcorrenciasOS
-                (idOS, idTecnico, descricao)
+                (
+                    idOS,
+                    idTecnico,
+                    descricao
+                )
+
              VALUES (?, ?, ?)`,
             [
                 idOS,
@@ -136,10 +196,12 @@ router.post("/", async (req, res) => {
             ]
         );
 
+        // Confirmar transação.
         await db.commit();
 
         return res.status(201).json({
-            mensagem: "Ocorrência registrada com sucesso!",
+            mensagem:
+                "Ocorrência registrada com sucesso!",
             idOcorrencia: resultado.insertId,
             idOS: Number(idOS)
         });
@@ -150,14 +212,21 @@ router.post("/", async (req, res) => {
             try {
                 await db.rollback();
             } catch (erroRollback) {
-                console.error(erroRollback.message);
+                console.error(
+                    "Erro ao desfazer transação:",
+                    erroRollback.message
+                );
             }
         }
 
-        console.error("Erro ao registrar ocorrência:", erro.message);
+        console.error(
+            "Erro ao registrar ocorrência:",
+            erro.message
+        );
 
         return res.status(500).json({
-            mensagem: "Erro ao registrar ocorrência."
+            mensagem:
+                "Erro ao registrar ocorrência."
         });
 
     } finally {
@@ -165,6 +234,7 @@ router.post("/", async (req, res) => {
         if (db) {
             db.release();
         }
+
     }
 });
 
@@ -177,64 +247,114 @@ router.get("/:idOS", async (req, res) => {
 
     const { idOS } = req.params;
 
+    // Validar identificador.
     if (!idValido(idOS)) {
+
         return res.status(400).json({
-            mensagem: "ID da Ordem de Serviço inválido."
+            mensagem:
+                "ID da Ordem de Serviço inválido."
         });
     }
 
     try {
 
-        // Verificar a existência e a propriedade da OS
+        // ======================================
+        // CONSULTAR A ORDEM DE SERVIÇO
+        // ======================================
+
         const [ordens] = await conexao.execute(
             `SELECT
                 idOS,
                 idCliente,
-                idTecnico
+                idTecnico,
+                statusOS,
+                excluidaEm
+
              FROM OrdensServico
+
              WHERE idOS = ?`,
             [idOS]
         );
 
-        if (ordens.length === 0) {
+        // ======================================
+        // PROTEÇÃO DE EXCLUSÃO LÓGICA
+        // ======================================
+
+        // Não permitir consultar ocorrências
+        // de uma OS excluída.
+        if (
+            ordens.length === 0 ||
+            ordens[0].excluidaEm !== null
+        ) {
+
             return res.status(404).json({
-                mensagem: "Ordem de Serviço não encontrada."
+                mensagem:
+                    "Ordem de Serviço não encontrada."
             });
         }
 
-        if (!podeConsultarOS(ordens[0], req.usuario)) {
+        const os = ordens[0];
+
+        // ======================================
+        // VERIFICAR PERMISSÕES
+        // ======================================
+
+        if (!podeConsultarOS(os, req.usuario)) {
             return acessoNegado(res);
         }
 
-        // Consultar ocorrências com nome do técnico
+        // ======================================
+        // BUSCAR OCORRÊNCIAS NO MYSQL
+        // ======================================
+
         const [ocorrencias] = await conexao.execute(
             `SELECT
                 ocorrencia.idOcorrencia,
                 ocorrencia.idOS,
                 ocorrencia.idTecnico,
+
                 tecnico.nomeCompleto AS nomeTecnico,
+
                 ocorrencia.descricao,
                 ocorrencia.dataRegistro
+
              FROM OcorrenciasOS AS ocorrencia
+
              INNER JOIN Usuarios AS tecnico
-                ON tecnico.idUsuario = ocorrencia.idTecnico
+                ON tecnico.idUsuario =
+                   ocorrencia.idTecnico
+
              WHERE ocorrencia.idOS = ?
+
              ORDER BY
                 ocorrencia.dataRegistro DESC,
                 ocorrencia.idOcorrencia DESC`,
             [idOS]
         );
 
-        return res.json(ocorrencias);
+        // ======================================
+        // RETORNAR OCORRÊNCIAS
+        // ======================================
+
+        return res.status(200).json(ocorrencias);
 
     } catch (erro) {
 
-        console.error("Erro ao consultar ocorrências:", erro.message);
+        console.error(
+            "Erro ao consultar ocorrências:",
+            erro.message
+        );
 
         return res.status(500).json({
-            mensagem: "Erro ao consultar ocorrências."
+            mensagem:
+                "Erro ao consultar ocorrências."
         });
+
     }
 });
+
+// ==============================================
+// EXPORTAR ROTAS
+// ==============================================
 
 module.exports = router;

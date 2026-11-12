@@ -1,7 +1,8 @@
-// ==========================================
-// TECHFLOW - AGENDAMENTOS
-// Integração do calendário com o MySQL
-// ==========================================
+/* ==========================================
+   TECHFLOW - AGENDAMENTOS
+   Integração do calendário com o MySQL
+   Proteção contra OS excluídas logicamente
+   ========================================== */
 
 const express = require("express");
 const conexao = require("../database/conexao");
@@ -13,7 +14,8 @@ const router = express.Router();
 // ==========================================
 
 const idValido = (id) =>
-    /^[1-9]\d*$/.test(String(id));
+    /^[1-9]\d*$/.test(String(id)) &&
+    Number.isSafeInteger(Number(id));
 
 function dataValida(data) {
 
@@ -25,16 +27,24 @@ function dataValida(data) {
     }
 
     const [ano, mes, dia] = data.split("-").map(Number);
-    const dataVerificada = new Date(Date.UTC(ano, mes - 1, dia));
 
-    return dataVerificada.getUTCFullYear() === ano &&
+    const dataVerificada = new Date(
+        Date.UTC(ano, mes - 1, dia)
+    );
+
+    return (
+        dataVerificada.getUTCFullYear() === ano &&
         dataVerificada.getUTCMonth() === mes - 1 &&
-        dataVerificada.getUTCDate() === dia;
+        dataVerificada.getUTCDate() === dia
+    );
 }
 
 function horaValida(hora) {
-    return typeof hora === "string" &&
-        /^([01]\d|2[0-3]):[0-5]\d$/.test(hora);
+
+    return (
+        typeof hora === "string" &&
+        /^([01]\d|2[0-3]):[0-5]\d$/.test(hora)
+    );
 }
 
 // ==========================================
@@ -91,18 +101,23 @@ router.get("/", async (req, res) => {
 
             LEFT JOIN Usuarios AS tecnico
                 ON tecnico.idUsuario = os.idTecnico
+
+            WHERE os.excluidaEm IS NULL
         `;
 
         const parametros = [];
 
+        // Técnico vê somente os agendamentos
+        // das ordens atribuídas a ele.
         if (usuario.perfil === "tecnico") {
 
-            sql += " WHERE os.idTecnico = ?";
+            sql += " AND os.idTecnico = ?";
             parametros.push(usuario.idUsuario);
 
         } else if (usuario.perfil === "cliente") {
 
-            sql += " WHERE os.idCliente = ?";
+            // Cliente vê somente seus agendamentos.
+            sql += " AND os.idCliente = ?";
             parametros.push(usuario.idUsuario);
         }
 
@@ -140,11 +155,12 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
 
-    // Apenas administrador pode agendar
+    // Apenas administradores podem agendar.
     if (req.usuario.perfil !== "administrador") {
 
         return res.status(403).json({
-            mensagem: "Somente administradores podem agendar atendimentos."
+            mensagem:
+                "Somente administradores podem agendar atendimentos."
         });
     }
 
@@ -154,6 +170,10 @@ router.post("/", async (req, res) => {
         horaAgendamento,
         observacao
     } = req.body || {};
+
+    // ======================================
+    // VALIDAR DADOS
+    // ======================================
 
     if (!idValido(idOS)) {
 
@@ -165,14 +185,16 @@ router.post("/", async (req, res) => {
     if (!dataValida(dataAgendamento)) {
 
         return res.status(400).json({
-            mensagem: "Informe uma data válida no formato AAAA-MM-DD."
+            mensagem:
+                "Informe uma data válida no formato AAAA-MM-DD."
         });
     }
 
     if (!horaValida(horaAgendamento)) {
 
         return res.status(400).json({
-            mensagem: "Informe um horário válido no formato HH:MM."
+            mensagem:
+                "Informe um horário válido no formato HH:MM."
         });
     }
 
@@ -184,12 +206,14 @@ router.post("/", async (req, res) => {
             observacao.length > 500
         )
     ) {
+
         return res.status(400).json({
-            mensagem: "A observação deve ter no máximo 500 caracteres."
+            mensagem:
+                "A observação deve ter no máximo 500 caracteres."
         });
     }
 
-    // Impedir agendamentos em datas passadas
+    // Impedir agendamentos em datas passadas.
     const dataHora = new Date(
         `${dataAgendamento}T${horaAgendamento}:00`
     );
@@ -197,7 +221,8 @@ router.post("/", async (req, res) => {
     if (dataHora.getTime() <= Date.now()) {
 
         return res.status(400).json({
-            mensagem: "O agendamento deve ter uma data e hora futuras."
+            mensagem:
+                "O agendamento deve ter uma data e hora futuras."
         });
     }
 
@@ -208,14 +233,21 @@ router.post("/", async (req, res) => {
         db = await conexao.getConnection();
         await db.beginTransaction();
 
-        // Verificar OS e bloquear durante o cadastro
+        // ======================================
+        // VERIFICAR A OS NO MYSQL
+        // ======================================
+
         const [ordens] = await db.execute(
             `SELECT
                 idOS,
                 idTecnico,
-                statusOS
+                statusOS,
+                excluidaEm
+
              FROM OrdensServico
+
              WHERE idOS = ?
+
              FOR UPDATE`,
             [idOS]
         );
@@ -225,35 +257,63 @@ router.post("/", async (req, res) => {
             await db.rollback();
 
             return res.status(404).json({
-                mensagem: "Ordem de Serviço não encontrada."
+                mensagem:
+                    "Ordem de Serviço não encontrada."
             });
         }
 
         const os = ordens[0];
 
-        // Não agendar ordens finalizadas
+        // ======================================
+        // PROTEÇÃO DA EXCLUSÃO LÓGICA
+        // ======================================
+
+        if (os.excluidaEm !== null) {
+
+            await db.rollback();
+
+            return res.status(404).json({
+                mensagem:
+                    "Ordem de Serviço não encontrada."
+            });
+        }
+
+        // ======================================
+        // VERIFICAR STATUS DA OS
+        // ======================================
+
         if (
-            ["Concluída", "Cancelada"].includes(os.statusOS)
+            ["Concluída", "Cancelada"].includes(
+                os.statusOS
+            )
         ) {
 
             await db.rollback();
 
             return res.status(400).json({
-                mensagem: "Não é possível agendar uma OS finalizada."
+                mensagem:
+                    "Não é possível agendar uma OS finalizada."
             });
         }
 
-        // Exigir técnico responsável
+        // ======================================
+        // EXIGIR TÉCNICO RESPONSÁVEL
+        // ======================================
+
         if (!os.idTecnico) {
 
             await db.rollback();
 
             return res.status(400).json({
-                mensagem: "Atribua um técnico antes de agendar."
+                mensagem:
+                    "Atribua um técnico antes de agendar."
             });
         }
 
-        // Registrar agendamento
+        // ======================================
+        // REGISTRAR AGENDAMENTO
+        // ======================================
+
         const [resultado] = await db.execute(
             `INSERT INTO AgendamentosOS
                 (
@@ -274,7 +334,8 @@ router.post("/", async (req, res) => {
         await db.commit();
 
         return res.status(201).json({
-            mensagem: "Agendamento cadastrado com sucesso!",
+            mensagem:
+                "Agendamento cadastrado com sucesso!",
             idAgendamento: resultado.insertId,
             idOS: Number(idOS)
         });
@@ -282,10 +343,14 @@ router.post("/", async (req, res) => {
     } catch (erro) {
 
         if (db) {
+
             try {
                 await db.rollback();
             } catch (erroRollback) {
-                console.error(erroRollback.message);
+                console.error(
+                    "Erro ao desfazer transação:",
+                    erroRollback.message
+                );
             }
         }
 
@@ -295,7 +360,8 @@ router.post("/", async (req, res) => {
         );
 
         return res.status(500).json({
-            mensagem: "Erro ao cadastrar agendamento."
+            mensagem:
+                "Erro ao cadastrar agendamento."
         });
 
     } finally {
@@ -305,5 +371,9 @@ router.post("/", async (req, res) => {
         }
     }
 });
+
+// ==========================================
+// EXPORTAR ROTAS
+// ==========================================
 
 module.exports = router;
