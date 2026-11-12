@@ -251,7 +251,28 @@ Consulte o arquivo `.env.example` e o módulo de conexão para identificar as de
 - Não publique o arquivo `.env` no GitHub.
 - Nunca compartilhe senhas ou chaves reais.
 
-### 7.5. Iniciar o servidor
+
+### 7.5. Criar o administrador inicial
+
+Após configurar o banco de dados e as variáveis de ambiente,
+abra o terminal na pasta `backend` e execute:
+
+```bash
+node scripts/criar-admin-inicial.js
+```
+
+O script solicita as informações necessárias para cadastrar
+o primeiro administrador e gera uma senha inicial.
+
+Guarde a senha gerada em local seguro.
+
+Por segurança, o script impede a criação de outro administrador
+inicial quando já existe um administrador cadastrado.
+
+Depois disso, acesse a tela de login dos funcionários para
+entrar no sistema.
+
+### 7.6. Iniciar o servidor
 
 Na pasta `backend`, execute:
 
@@ -267,7 +288,7 @@ http://localhost:3000
 
 Mantenha o terminal aberto enquanto utiliza o sistema.
 
-### 7.6. Acessar as interfaces
+### 7.7. Acessar as interfaces
 
 **Página principal:**
 
