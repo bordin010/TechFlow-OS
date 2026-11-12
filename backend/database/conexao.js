@@ -1,29 +1,54 @@
-// ==========================================
-// TECHFLOW - CONEXÃO COM O MYSQL
-// ==========================================
+/*
+==========================================
+TECHFLOW OS
+CONEXÃO COM O BANCO DE DADOS MYSQL
+==========================================
+*/
 
 const mysql = require("mysql2/promise");
 
-// Configuração da conexão com o MySQL
+// Carregar variáveis do arquivo .env.
+// Funciona mesmo quando este módulo é
+// utilizado fora do server.js.
+require("dotenv").config({
+    path: require("path").join(__dirname, "..", ".env")
+});
+
+// ==========================================
+// CONFIGURAÇÃO DA CONEXÃO
+// ==========================================
+
 const conexao = mysql.createPool({
 
-    host: "localhost",
+    // Servidor MySQL
+    host: process.env.DB_HOST || "localhost",
 
-    user: "root",
+    // Porta do MySQL
+    port: Number(process.env.DB_PORT || 3306),
 
+    // Usuário do banco
+    user: process.env.DB_USER || "root",
+
+    // Senha do banco
     password: process.env.DB_PASSWORD,
 
-    database: "techflow",
+    // Nome do banco
+    database: process.env.DB_NAME || "techflow",
 
-    // Utilizar UTF-8 para preservar acentos
-    // e caracteres especiais
+    // Suporte a caracteres especiais
     charset: "utf8mb4",
 
-    // Configurações do pool de conexões
+    // Pool de conexões
     waitForConnections: true,
 
-    connectionLimit: 10
+    connectionLimit: 10,
+
+    queueLimit: 0
 
 });
+
+// ==========================================
+// EXPORTAR CONEXÃO
+// ==========================================
 
 module.exports = conexao;
