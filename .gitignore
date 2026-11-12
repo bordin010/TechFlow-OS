@@ -8,3 +8,4 @@ node_modules/
 logs/
 .DS_Store
 Thumbs.db
+backend/teste-instalacao.env

@@ -21,7 +21,7 @@ const verificarToken = require("./middlewares/verificarToken");
 const verificarPerfil = require("./middlewares/verificarPerfil");
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Receber dados em formato JSON
 app.use(express.json());
