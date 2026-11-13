@@ -29,6 +29,10 @@ Depois execute:
 node server.js
 ```
 
+## Geramento de CPF Válido para uma nova conta cadastrada:
+
+node -e "let n=Array.from({length:9},()=>Math.floor(Math.random()*10));for(let p of [10,11]){let s=n.slice(0,p-1).reduce((a,v,i)=>a+v*(p-i),0);n.push(s%11<2?0:11-s%11)}console.log(n.join(''))"
+
 Deixe o terminal aberto. Use as páginas **exclusivamente pela porta 3000**:
 
 - Principal: `http://localhost:3000/frontend/tela-principal/index.html`
