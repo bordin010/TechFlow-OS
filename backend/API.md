@@ -1622,7 +1622,7 @@ O código-fonte do TechFlow é versionado com Git e armazenado no GitHub.
 
 **Repositório:**
 
-https://github.com/bordin010/Projeto-TechFlow
+https://github.com/bordin010/TechFlow-OS.git
 
 **Branch principal:** `main`
 
